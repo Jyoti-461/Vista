@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Smooth theme transition */
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* DEFAULT = DARK MODE */
+body {
+  background-color: #020617; /* darkbg */
+  color: #E5E7EB; /* gray-200 */
+}
+
+/* LIGHT MODE (only when .dark is REMOVED) */
+html:not(.dark) body {
+  background-color: #F8FAFC; /* lightbg */
+  color: #020617;
+}
+
+/* Neon effects */
+.neon-primary {
+  box-shadow:
+    0 0 8px rgba(99,102,241,0.7),
+    0 0 24px rgba(99,102,241,0.45);
+}
+
+.neon-secondary {
+  box-shadow:
+    0 0 8px rgba(34,211,238,0.7),
+    0 0 24px rgba(34,211,238,0.45);
+}
+/* Vertical auto scroll */
+.vertical-scroll {
+  height: 420px;
+  overflow: hidden;
+  position: relative;
+}
+
+.vertical-track {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  animation: verticalScroll 30s linear infinite;
+}
+
+.vertical-scroll:hover .vertical-track {
+  animation-play-state: paused;
+}
+
+@keyframes verticalScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
