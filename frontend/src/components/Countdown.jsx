@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const Countdown = () => {
   // 👉 EVENT DATE
-  const eventDate = new Date("2026-02-15T09:00:00").getTime();
+  const eventDate = new Date("2026-02-09T09:00:00").getTime();
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -34,7 +34,7 @@ const Countdown = () => {
   }, [eventDate]);
 
   return (
-    <section className="py-20 text-center bg-lightbg dark:bg-darkbg transition">
+    <section className="py-12 text-center bg-lightbg dark:bg-darkbg transition">
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

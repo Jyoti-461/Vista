@@ -41,19 +41,28 @@ html:not(.dark) body {
 .vertical-track {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  animation: verticalScroll 30s linear infinite;
+  gap: 14px;
+  animation-name: scrollUp;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
-.vertical-scroll:hover .vertical-track {
-  animation-play-state: paused;
-}
-
-@keyframes verticalScroll {
-  0% {
+/* IMPORTANT FIX */
+@keyframes scrollUp {
+  from {
     transform: translateY(0);
   }
-  100% {
+  to {
     transform: translateY(-50%);
   }
 }
+
+
+/* Pause on hover (optional but professional) */
+.vertical-scroll:hover .vertical-track {
+  animation-play-state: paused;
+}
+html {
+  scroll-behavior: smooth;
+}
+

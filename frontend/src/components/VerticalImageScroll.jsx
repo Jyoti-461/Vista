@@ -1,8 +1,10 @@
-const VerticalImageScroll = ({ images }) => {
+const VerticalImageScroll = ({ images, speed = 28 }) => {
   return (
     <div className="vertical-scroll rounded-2xl border border-gray-800 dark:border-gray-700">
-      <div className="vertical-track p-2">
-        {/* Duplicate images for seamless loop */}
+      <div
+        className="vertical-track"
+        style={{ animationDuration: `${speed}s` }}
+      >
         {[...images, ...images].map((img, index) => (
           <img
             key={index}

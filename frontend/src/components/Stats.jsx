@@ -2,10 +2,10 @@ import { motion } from "framer-motion";
 import AnimatedCounter from "../components/AnimatedCounter";
 
 const statsData = [
-  { label: "Participants", value: 2500 },
-  { label: "Colleges", value: 120 },
+  { label: "Participants", value: 1500 },
+  { label: "Colleges", value: 50 },
   { label: "Events", value: 15 },
-  { label: "Footfall", value: 5000 },
+  { label: "Audience", value: 3000 },
 ];
 
 const Stats = () => {

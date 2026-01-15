@@ -7,7 +7,7 @@ const Navbar = () => {
   const [dark, setDark] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Detect scroll
+  // Detect scroll for navbar style
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -16,7 +16,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ FORCE DARK MODE ON FIRST LOAD
+  // Force dark mode on first load
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
@@ -27,7 +27,28 @@ const Navbar = () => {
     document.documentElement.classList.toggle("dark");
   };
 
-  const navItems = ["About", "Events", "Register", "Team", "Contact"];
+  // Navigation items (must match section ids)
+  const navItems = [
+    { label: "About", id: "about" },
+    { label: "Events", id: "events" },
+    { label: "Register", id: "register" },
+    { label: "Contact", id: "contact" },
+  ];
+
+  // Smooth scroll handler with offset
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (!section) return;
+
+    const offset = 80; // navbar height
+    const y =
+      section.getBoundingClientRect().top +
+      window.pageYOffset -
+      offset;
+
+    window.scrollTo({ top: y, behavior: "smooth" });
+    setMenuOpen(false);
+  };
 
   return (
     <nav
@@ -39,8 +60,12 @@ const Navbar = () => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
         {/* Logo */}
-        <h1 className="text-lg font-bold text-primary neon-primary">
+        <h1
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="text-lg font-bold text-primary neon-primary cursor-pointer"
+        >
           TechVerse Vista{" "}
           <span className="text-gray-700 dark:text-gray-300">2026</span>
         </h1>
@@ -49,23 +74,25 @@ const Navbar = () => {
         <ul className="hidden md:flex items-center gap-8 text-sm text-gray-700 dark:text-gray-300">
           {navItems.map((item) => (
             <li
-              key={item}
+              key={item.id}
+              onClick={() => scrollToSection(item.id)}
               className="relative cursor-pointer hover:text-primary transition"
             >
-              {item}
+              {item.label}
               <span
                 className="
                   absolute -bottom-1 left-0 w-0 h-[2px]
                   bg-primary transition-all duration-300
-                  hover:w-full
+                  group-hover:w-full
                 "
               />
             </li>
           ))}
         </ul>
 
-        {/* Right controls */}
+        {/* Right Controls */}
         <div className="flex items-center gap-4">
+
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
@@ -123,15 +150,15 @@ const Navbar = () => {
             <ul className="flex flex-col px-6 py-6 gap-6 text-sm">
               {navItems.map((item) => (
                 <li
-                  key={item}
-                  onClick={() => setMenuOpen(false)}
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
                   className="
                     cursor-pointer
                     text-gray-700 dark:text-gray-300
                     hover:text-primary transition
                   "
                 >
-                  {item}
+                  {item.label}
                 </li>
               ))}
             </ul>

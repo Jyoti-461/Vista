@@ -1,17 +1,20 @@
 import { motion } from "framer-motion";
 import VerticalImageScroll from "./VerticalImageScroll";
 
-const eventImages = Array.from({ length: 10 }, (_, i) =>
+const eventImages = Array.from({ length: 9 }, (_, i) =>
   `/about/event/${i + 1}.jpg`
 );
 
-const collegeImages = Array.from({ length: 10 }, (_, i) =>
+const collegeImages = Array.from({ length: 9 }, (_, i) =>
   `/about/college/${i + 1}.jpg`
 );
 
 const About = () => {
   return (
-    <section className="py-24 px-6 bg-white dark:bg-black transition-colors duration-300">
+    <section
+      id="about"
+      className="py-24 px-6 bg-white dark:bg-black transition-colors duration-300"
+    >
       <div className="max-w-7xl mx-auto space-y-28">
 
         {/* ===== ABOUT EVENT ===== */}
@@ -23,7 +26,7 @@ const About = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <VerticalImageScroll images={eventImages} />
+            <VerticalImageScroll images={eventImages} speed={30} />
           </motion.div>
 
           {/* Text */}
@@ -75,7 +78,7 @@ const About = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <VerticalImageScroll images={collegeImages} />
+            <VerticalImageScroll images={collegeImages} speed={30} />
           </motion.div>
         </div>
 

@@ -51,6 +51,7 @@ const RegisterForm = () => {
 
   return (
     <section
+    id="register"
       className="
         py-20 px-6 flex justify-center
         bg-lightbg dark:bg-darkbg
@@ -119,11 +120,10 @@ const RegisterForm = () => {
             "
           >
             <option value="">Select Event</option>
-            <option value="Hackathon">Hackathon</option>
-            <option value="Coding Contest">Coding Contest</option>
-            <option value="UI/UX Challenge">UI/UX Challenge</option>
-            <option value="Tech Quiz">Tech Quiz</option>
-          </select>
+            <option value="Web-a-Thon">Web-a-Thon</option>
+            <option value="BGMI E-Sports">BGMI E-Sports</option>
+            <option value="Valorant 5v5">Valorant E-Sports</option>
+              </select>
 
           {/* Role */}
           <select
@@ -141,8 +141,8 @@ const RegisterForm = () => {
             "
           >
             <option value="">Select Role</option>
-            <option value="Student">Student</option>
-            <option value="Other">Other</option>
+            <option value="Student">TIMSCDR Student</option>
+            <option value="Other">Other Student</option>
           </select>
 
           {/* Submit */}

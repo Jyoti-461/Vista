@@ -6,7 +6,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="relative bg-lightbg dark:bg-darkbg border-t border-gray-300 dark:border-gray-800 py-14 px-6 transition-colors">
+    <footer id="contact" className="relative bg-lightbg dark:bg-darkbg border-t border-gray-300 dark:border-gray-800 py-14 px-6 transition-colors">
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
 
