@@ -13,11 +13,12 @@ connectDB();
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.use("/api", require("./routes/registrationRoutes"));
-app.use("/api", require("./routes/adminRoutes"));
-app.use("/api", require("./routes/registerRoutes"));
+// ✅ STATIC FILES (VERY IMPORTANT)
+app.use("/uploads", express.static("uploads"));
 
+// Routes (KEEP IT CLEAN)
+app.use("/api", require("./routes/registrationRoutes"));
+// app.use("/api", require("./routes/adminRoutes")); // enable later if needed
 
 app.get("/", (req, res) => {
   res.send("Backend is running");
