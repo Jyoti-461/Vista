@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import { useEffect } from "react";
 const Valorant = () => {
   const navigate = useNavigate();
+useEffect(() => {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}, []);
 
   return (
     <section className="min-h-screen bg-darkbg text-gray-200 px-6 py-24 relative">
@@ -48,9 +51,9 @@ const Valorant = () => {
 
           <TimelineCard
             align="left"
-            title="Team Composition"
-            date="Players"
-            time="5 + 1 Substitute"
+            title="Entry & Team Details"
+            date="Entry Fee"
+            time="₹300 per team"
             description="Each team must consist of 5 main players. A maximum of 1 substitute is allowed. A player may not play for more than one team."
           />
 

@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
+import { useEffect } from "react";
 const Webathon = () => {
   const navigate = useNavigate();
+useEffect(() => {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}, []);
 
   return (
     <section className="min-h-screen bg-darkbg text-gray-200 px-6 py-24 relative">
@@ -34,7 +37,7 @@ const Webathon = () => {
           transition={{ duration: 0.6 }}
           className="text-4xl md:text-5xl font-bold text-center mb-20"
         >
-          Web-a-Thon{" "}
+          AI Forge{" "}
           <span className="text-primary drop-shadow-[0_0_15px_rgba(99,102,241,0.8)]">
             Timeline
           </span>
@@ -51,14 +54,14 @@ const Webathon = () => {
             title="Web-a-Thon"
             date="Event Day"
             time="On-spot Problem Statement"
-            description="Participants must design and develop a website based on a given problem statement within a limited time."
+            description="Participants must design and develop a model based on a given problem statement within a limited time."
           />
 
           <TimelineCard
             align="right"
             title="Team & Registration"
             date="Registration Fee"
-            time="₹200 per team"
+            time="₹100 per team"
             description="Team size: 2 members. Exciting cash prizes and certificates will be awarded."
           />
 
@@ -86,10 +89,10 @@ const Webathon = () => {
 
           <ul className="space-y-4 text-gray-400 text-sm md:text-base leading-relaxed list-disc list-inside">
             <li>Participants must design a website along with backend support.</li>
-            <li>The website must contain <strong>four web pages</strong>.</li>
+            <li>The website must fullfill the<strong> accurracy of Statement</strong>.</li>
             <li>The problem statement will be provided on the event day.</li>
-            <li>Frameworks/tools such as <strong>React, Angular, jQuery, and Figma</strong> are allowed.</li>
-            <li>Internet usage is allowed <strong>only for reference purposes</strong>.</li>
+            <li>Frameworks/tools such as <strong>Scikit-learn, TensorFlow, Python, Flask / Django</strong> are allowed.</li>
+            <li>Internet usage is allowed <strong>for AI or References</strong>.</li>
             <li>The website must be <strong>original</strong> and developed during the event.</li>
             <li>Use of pre-built or ready-made templates is <strong>strictly prohibited</strong>.</li>
             <li>Judging will be based on UI, functionality, innovation, and completeness.</li>
@@ -157,11 +160,11 @@ const TimelineCard = ({ align, title, date, time, description }) => {
         </h3>
 
         <p className="text-sm text-pink-400 mb-1">
-          Date: {date}
+          {date}
         </p>
 
         <p className="text-sm text-yellow-400 mb-3">
-          Time: {time}
+          {time}
         </p>
 
         <p className="text-sm text-gray-400 leading-relaxed">

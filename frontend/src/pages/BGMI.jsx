@@ -1,9 +1,13 @@
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 const BGMI = () => {
   const navigate = useNavigate();
+useEffect(() => {
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+}, []);
 
   return (
     <section className="min-h-screen bg-darkbg text-gray-200 px-6 py-24 relative">
@@ -50,8 +54,8 @@ const BGMI = () => {
             align="left"
             title="Entry & Team Details"
             date="Entry Fee"
-            time="₹300 per team"
-            description="Each team must pay an entry fee of ₹300. Participants must carry their college ID card on the event day."
+            time="₹200 per team"
+            description="Each team must consist of 4 main players. A maximum of 1 substitute is allowed. A player may not play for more than one team."
           />
 
           <TimelineCard
@@ -75,7 +79,7 @@ const BGMI = () => {
             title="Code of Conduct"
             date="Discipline"
             time="Mandatory"
-            description="No abusive or vulgar language is allowed. Any malpractice, cheating, or hacking will lead to immediate disqualification."
+            description="No abusive or vulgar language is allowed during match. Any malpractice, cheating, or hacking will lead to immediate disqualification."
           />
 
           <TimelineCard
@@ -91,7 +95,7 @@ const BGMI = () => {
             title="Final Decision"
             date="Judgement"
             time="Event Day"
-            description="Event Heads’ and Judges’ decisions will be final. Winners will be declared on the event day."
+            description="Winner will be finalized on the basis of Points Table by Event Judge's. Winners will be declared on the event day."
           />
 
         </div>

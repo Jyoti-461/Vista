@@ -9,12 +9,12 @@ const registrationSchema = new mongoose.Schema(
       trim: true,
     },
 
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      trim: true,
-    },
+    mobile: {
+  type: String,
+  required: true,
+  match: /^[6-9]\d{9}$/ // Indian mobile validation (optional)
+},
+
 
     college: {
       type: String,
@@ -58,7 +58,25 @@ const registrationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    ocrText: {
+  type: String,
+  default: null,
+},
+
+paymentStatus: {
+  type: String,
+  enum: ["PENDING", "VERIFIED", "FLAGGED", "REJECTED"],
+  default: "PENDING",
+},
+ocrData: {
+  extractedTxnId: String,
+  extractedAmount: String,
+  successTextFound: Boolean,
+},
   },
+{
+    timestamps: true, 
+  }
 );
 
 module.exports = mongoose.model("Registration", registrationSchema);

@@ -1,19 +1,65 @@
 exports.parsePaymentData = (text) => {
-  const lower = text.toLowerCase();
+  if (!text) {
+    return {
+      extractedTxnIds: [],
+      extractedAmount: null,
+      successTextFound: false,
+    };
+  }
 
-  const txnMatch =
-    text.match(/[A-Z0-9]{10,}/i) || [];
+  const clean = text
+    .replace(/\n/g, " ")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
 
-  const amountMatch =
-    text.match(/₹\s?\d+(\.\d{1,2})?/);
+  /* ---------------- TRANSACTION IDS ---------------- */
 
-  const success =
-    lower.includes("successful") ||
-    lower.includes("completed");
+  // Labeled IDs (UTR, Transaction ID, Ref, etc.)
+  const labeledRegex =
+    /(utr|transaction id|txn id|upi ref|reference no|ref no)[\s:.-]*([a-z0-9]{8,30})/gi;
+
+  const extractedTxnIds = [];
+  let match;
+
+  while ((match = labeledRegex.exec(clean)) !== null) {
+    extractedTxnIds.push(match[2]);
+  }
+
+  // Fallback: long alphanumeric sequences
+  const genericMatches = clean.match(/\b[a-z0-9]{10,30}\b/g);
+  if (genericMatches) {
+    extractedTxnIds.push(...genericMatches);
+  }
+
+  /* ---------------- AMOUNT ---------------- */
+
+  const amountRegex =
+    /(₹|rs\.?|inr)\s?(\d{1,6}(\.\d{1,2})?)/i;
+
+  const amountMatch = clean.match(amountRegex);
+
+  /* ---------------- SUCCESS TEXT ---------------- */
+
+  const successKeywords = [
+    "successful",
+    "success",
+    "completed",
+    "payment done",
+    "paid",
+    "paid successfully",
+    "transaction successful",
+    "transaction completed",
+    "payment complete",
+    "debited",
+  ];
+
+  const successTextFound = successKeywords.some((k) =>
+    clean.includes(k)
+  );
 
   return {
-    transactionId: txnMatch[0] || null,
-    amount: amountMatch ? amountMatch[0] : null,
-    success,
+    extractedTxnIds: [...new Set(extractedTxnIds)], // remove duplicates
+    extractedAmount: amountMatch ? amountMatch[2] : null,
+    successTextFound,
   };
 };

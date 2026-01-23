@@ -1,9 +1,11 @@
 const Registration = require("../models/Registration");
+const { extractTextFromImage } = require("../utils/ocr");
+const { parsePaymentData } = require("../utils/paymentParser");
 
 /* ---------------- EVENT RULES ---------------- */
 const EVENT_RULES = {
   "Web-a-Thon": { team: true, members: 2 },
-  "Valorant 5v5": { team: true, members: 6 }, // 5 + 1
+  "Valorant 5v5": { team: true, members: 6 },
   "BGMI E-Sports": { team: false, members: 1 },
 };
 
@@ -12,7 +14,7 @@ exports.createRegistration = async (req, res) => {
   try {
     const {
       name,
-      email,
+      mobile,
       college,
       event,
       teamName,
@@ -21,10 +23,18 @@ exports.createRegistration = async (req, res) => {
     } = req.body;
 
     /* ---- BASIC VALIDATION ---- */
-    if (!name || !email || !college || !event || !transactionId) {
+    if (!name || !mobile || !college || !event || !transactionId) {
       return res.status(400).json({
         success: false,
         message: "All required fields must be filled",
+      });
+    }
+
+    /* ---- MOBILE VALIDATION ---- */
+    if (!/^[6-9]\d{9}$/.test(mobile)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid mobile number",
       });
     }
 
@@ -61,21 +71,14 @@ exports.createRegistration = async (req, res) => {
         });
       }
 
-      if (
-        !Array.isArray(teamMembers) ||
-        teamMembers.length !== rule.members
-      ) {
+      if (!Array.isArray(teamMembers) || teamMembers.length !== rule.members) {
         return res.status(400).json({
           success: false,
           message: `Exactly ${rule.members} team members are required`,
         });
       }
     } else {
-      // Solo event (BGMI)
-      if (
-        !Array.isArray(teamMembers) ||
-        teamMembers.length !== 1
-      ) {
+      if (!Array.isArray(teamMembers) || teamMembers.length !== 1) {
         return res.status(400).json({
           success: false,
           message: "Solo event requires exactly one participant",
@@ -83,18 +86,47 @@ exports.createRegistration = async (req, res) => {
       }
     }
 
-    /* ---- SAVE REGISTRATION ---- */
+    /* ---- CREATE REGISTRATION (INITIAL) ---- */
     const registration = await Registration.create({
       name: name.trim(),
-      email: email.toLowerCase().trim(),
+      mobile: mobile.trim(),
       college: college.trim(),
       event,
       teamName: rule.team ? teamName.trim() : null,
-      teamMembers: teamMembers.map((m) => m.trim()),
+      teamMembers: teamMembers.map((m) => m.trim()).filter(Boolean),
       transactionId: transactionId.trim(),
       paymentScreenshot: req.file.path,
       paymentStatus: "PENDING",
     });
+
+    /* ---- OCR PROCESSING ---- */
+    const text = await extractTextFromImage(req.file.path);
+    const parsed = parsePaymentData(text);
+
+    /* ---- NORMALIZATION FUNCTION ---- */
+    const normalize = (s) =>
+      s?.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    const userTxn = normalize(transactionId);
+
+    let verified = false;
+    if (Array.isArray(parsed.extractedTxnIds)) {
+      for (const id of parsed.extractedTxnIds) {
+        if (normalize(id).includes(userTxn)) {
+          verified = true;
+          break;
+        }
+      }
+    }
+
+    /* ---- FINAL PAYMENT STATUS ---- */
+    registration.paymentStatus =
+      parsed.successTextFound && verified ? "VERIFIED" : "FLAGGED";
+
+    registration.ocrText = text;
+    registration.ocrData = parsed;
+
+    await registration.save();
 
     res.status(201).json({
       success: true,
@@ -113,7 +145,7 @@ exports.createRegistration = async (req, res) => {
 exports.getRegistrations = async (req, res) => {
   try {
     const registrations = await Registration
-      .find()
+      .find({}, "-email") // ensure email is never sent
       .sort({ createdAt: -1 });
 
     res.status(200).json({
