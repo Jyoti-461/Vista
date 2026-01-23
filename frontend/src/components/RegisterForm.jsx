@@ -60,7 +60,7 @@ const RegisterForm = () => {
       data.append("paymentScreenshot", formData.paymentScreenshot);
 
       formData.teamMembers.forEach((member) => {
-        data.append("teamMembers[]", member);
+        data.append("teamMembers", member);
       });
 
       const res = await axios.post(
