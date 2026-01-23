@@ -1,15 +1,14 @@
 const Registration = require("../models/Registration");
 const { extractTextFromImage } = require("../utils/ocr");
 const { parsePaymentData } = require("../utils/paymentParser");
+const cloudinary = require("../config/cloudinary");
 
-/* ---------------- EVENT RULES ---------------- */
 const EVENT_RULES = {
-  "Web-a-Thon": { team: true, members: 2 },
-  "Valorant 5v5": { team: true, members: 6 },
-  "BGMI E-Sports": { team: false, members: 1 },
+  "Web-a-Thon": { members: 1 },
+  "BGMI E-Sports": { members: 4 },
+  "Valorant 5v5": { members: 5 },
 };
 
-/* ---------------- POST /api/register ---------------- */
 exports.createRegistration = async (req, res) => {
   try {
     const {
@@ -22,118 +21,93 @@ exports.createRegistration = async (req, res) => {
       transactionId,
     } = req.body;
 
-    /* ---- BASIC VALIDATION ---- */
+    // BASIC VALIDATIONS
     if (!name || !mobile || !college || !event || !transactionId) {
-      return res.status(400).json({
-        success: false,
-        message: "All required fields must be filled",
-      });
+      return res.status(400).json({ success: false, message: "All fields required" });
     }
 
-    /* ---- MOBILE VALIDATION ---- */
     if (!/^[6-9]\d{9}$/.test(mobile)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid mobile number",
-      });
+      return res.status(400).json({ success: false, message: "Invalid mobile number" });
     }
 
     if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Payment screenshot is required",
-      });
+      return res.status(400).json({ success: false, message: "Payment screenshot required" });
     }
 
     const rule = EVENT_RULES[event];
     if (!rule) {
+      return res.status(400).json({ success: false, message: "Invalid event" });
+    }
+
+    // NORMALIZE TEAM MEMBERS
+    const normalizedMembers = Array.isArray(teamMembers)
+      ? teamMembers
+      : teamMembers
+      ? [teamMembers]
+      : [];
+
+    if (!teamName?.trim()) {
+      return res.status(400).json({ success: false, message: "Team name required" });
+    }
+
+    if (normalizedMembers.length !== rule.members) {
       return res.status(400).json({
         success: false,
-        message: "Invalid event selected",
+        message: `Exactly ${rule.members + 1} players required (including leader)`,
       });
     }
 
-    /* ---- DUPLICATE TRANSACTION CHECK ---- */
-    const txnExists = await Registration.findOne({ transactionId });
-    if (txnExists) {
-      return res.status(409).json({
-        success: false,
-        message: "Transaction ID already used",
-      });
-    }
+    // ✅ CLOUDINARY UPLOAD (REPLACES LOCAL FILE SYSTEM)
+    const uploadResult = await cloudinary.uploader.upload(
+      `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+      { folder: "vista_uploads" }
+    );
 
-    /* ---- TEAM VALIDATION ---- */
-    if (rule.team) {
-      if (!teamName || teamName.trim() === "") {
-        return res.status(400).json({
-          success: false,
-          message: "Team name is required for this event",
-        });
-      }
+    const imageUrl = uploadResult.secure_url;
 
-      if (!Array.isArray(teamMembers) || teamMembers.length !== rule.members) {
-        return res.status(400).json({
-          success: false,
-          message: `Exactly ${rule.members} team members are required`,
-        });
-      }
-    } else {
-      if (!Array.isArray(teamMembers) || teamMembers.length !== 1) {
-        return res.status(400).json({
-          success: false,
-          message: "Solo event requires exactly one participant",
-        });
-      }
-    }
-
-    /* ---- CREATE REGISTRATION (INITIAL) ---- */
+    // CREATE REGISTRATION
     const registration = await Registration.create({
       name: name.trim(),
       mobile: mobile.trim(),
       college: college.trim(),
       event,
-      teamName: rule.team ? teamName.trim() : null,
-      teamMembers: teamMembers.map((m) => m.trim()).filter(Boolean),
+      teamName: teamName.trim(),
+      teamMembers: normalizedMembers.map((m) => m.trim()),
       transactionId: transactionId.trim(),
-      paymentScreenshot: req.file.path,
-      paymentStatus: "PENDING",
+      paymentScreenshot: imageUrl, // ✅ CLOUDINARY URL
     });
 
-    /* ---- OCR PROCESSING ---- */
-    const text = await extractTextFromImage(req.file.path);
-    const parsed = parsePaymentData(text);
+    // ✅ OCR PROCESSING — SAFE (UNCHANGED LOGIC)
+    try {
+      const text = await extractTextFromImage(imageUrl);
+      const parsed = parsePaymentData(text);
 
-    /* ---- NORMALIZATION FUNCTION ---- */
-    const normalize = (s) =>
-      s?.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const normalize = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const verified =
+        parsed.successTextFound &&
+        parsed.extractedTxnIds?.some((id) =>
+          normalize(id).includes(normalize(transactionId))
+        );
 
-    const userTxn = normalize(transactionId);
-
-    let verified = false;
-    if (Array.isArray(parsed.extractedTxnIds)) {
-      for (const id of parsed.extractedTxnIds) {
-        if (normalize(id).includes(userTxn)) {
-          verified = true;
-          break;
-        }
-      }
+      registration.paymentStatus = verified ? "VERIFIED" : "FLAGGED";
+      registration.ocrText = text;
+      registration.ocrData = parsed;
+      await registration.save();
+    } catch (ocrErr) {
+      console.error("OCR failed:", ocrErr);
     }
 
-    /* ---- FINAL PAYMENT STATUS ---- */
-    registration.paymentStatus =
-      parsed.successTextFound && verified ? "VERIFIED" : "FLAGGED";
-
-    registration.ocrText = text;
-    registration.ocrData = parsed;
-
-    await registration.save();
-
-    res.status(201).json({
-      success: true,
-      data: registration,
-    });
+    res.status(201).json({ success: true, data: registration });
   } catch (error) {
-    console.error(error);
+    console.error("Server error:", error);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Transaction ID already exists",
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Server error. Registration failed.",
@@ -141,22 +115,15 @@ exports.createRegistration = async (req, res) => {
   }
 };
 
-/* ---------------- GET /api/register (Admin) ---------------- */
 exports.getRegistrations = async (req, res) => {
   try {
-    const registrations = await Registration
-      .find({}, "-email") // ensure email is never sent
-      .sort({ createdAt: -1 });
-
+    const registrations = await Registration.find().sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       count: registrations.length,
       data: registrations,
     });
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
