@@ -20,7 +20,7 @@ const HeroImage = () => {
     >
       {/* Poster Image */}
       <motion.img
-        src="/src/assets/vista.jpg"
+        src="/vista.jpg"
         alt="TechVerse Vista 2026 Poster"
         style={{ y }}
         className="
