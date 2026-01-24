@@ -10,6 +10,8 @@ const EVENT_RULES = {
 };
 
 exports.createRegistration = async (req, res) => {
+  let uploadResult; // 🔴 TRACK CLOUDINARY UPLOAD FOR CLEANUP
+
   try {
     const {
       name,
@@ -57,8 +59,17 @@ exports.createRegistration = async (req, res) => {
       });
     }
 
-    // ✅ CLOUDINARY UPLOAD (REPLACES LOCAL FILE SYSTEM)
-    const uploadResult = await cloudinary.uploader.upload(
+    // 🔒 DUPLICATE TRANSACTION CHECK (BEFORE UPLOAD)
+    const existing = await Registration.findOne({ transactionId });
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: "Transaction ID already exists",
+      });
+    }
+
+    // ✅ CLOUDINARY UPLOAD (ONLY AFTER ALL VALIDATIONS PASS)
+    uploadResult = await cloudinary.uploader.upload(
       `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
       { folder: "vista_uploads" }
     );
@@ -74,10 +85,10 @@ exports.createRegistration = async (req, res) => {
       teamName: teamName.trim(),
       teamMembers: normalizedMembers.map((m) => m.trim()),
       transactionId: transactionId.trim(),
-      paymentScreenshot: imageUrl, // ✅ CLOUDINARY URL
+      paymentScreenshot: imageUrl,
     });
 
-    // ✅ OCR PROCESSING — SAFE (UNCHANGED LOGIC)
+    // OCR PROCESSING (UNCHANGED)
     try {
       const text = await extractTextFromImage(imageUrl);
       const parsed = parsePaymentData(text);
@@ -98,8 +109,14 @@ exports.createRegistration = async (req, res) => {
     }
 
     res.status(201).json({ success: true, data: registration });
+
   } catch (error) {
     console.error("Server error:", error);
+
+    // 🔥 CLEANUP CLOUDINARY IF ANY ERROR AFTER UPLOAD
+    if (uploadResult?.public_id) {
+      await cloudinary.uploader.destroy(uploadResult.public_id);
+    }
 
     if (error.code === 11000) {
       return res.status(409).json({
@@ -112,18 +129,5 @@ exports.createRegistration = async (req, res) => {
       success: false,
       message: "Server error. Registration failed.",
     });
-  }
-};
-
-exports.getRegistrations = async (req, res) => {
-  try {
-    const registrations = await Registration.find().sort({ createdAt: -1 });
-    res.status(200).json({
-      success: true,
-      count: registrations.length,
-      data: registrations,
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
   }
 };
