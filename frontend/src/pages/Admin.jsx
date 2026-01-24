@@ -40,6 +40,7 @@ const [searchTerm, setSearchTerm] = useState("");
 
       "Sr No": index + 1,
       "Team Name": item.teamName,
+       "Team Leader": item.name,
       "Team Members": item.teamMembers?.join(", "),
       Mobile: item.mobile,
       College: item.college,
