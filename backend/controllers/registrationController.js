@@ -10,6 +10,8 @@ const EVENT_RULES = {
 };
 
 exports.createRegistration = async (req, res) => {
+  let uploadedPublicId = null;
+
   try {
     const {
       name,
@@ -39,7 +41,6 @@ exports.createRegistration = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid event" });
     }
 
-    // NORMALIZE TEAM MEMBERS
     const normalizedMembers = Array.isArray(teamMembers)
       ? teamMembers
       : teamMembers
@@ -57,13 +58,23 @@ exports.createRegistration = async (req, res) => {
       });
     }
 
-    // ✅ CLOUDINARY UPLOAD (REPLACES LOCAL FILE SYSTEM)
+    // 🔒 DUPLICATE TRANSACTION CHECK (BEFORE CLOUDINARY)
+    const exists = await Registration.findOne({ transactionId: transactionId.trim() });
+    if (exists) {
+      return res.status(409).json({
+        success: false,
+        message: "Transaction ID already exists",
+      });
+    }
+
+    // ✅ CLOUDINARY UPLOAD (ONLY AFTER ALL CHECKS PASS)
     const uploadResult = await cloudinary.uploader.upload(
       `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
       { folder: "vista_uploads" }
     );
 
     const imageUrl = uploadResult.secure_url;
+    uploadedPublicId = uploadResult.public_id;
 
     // CREATE REGISTRATION
     const registration = await Registration.create({
@@ -74,10 +85,10 @@ exports.createRegistration = async (req, res) => {
       teamName: teamName.trim(),
       teamMembers: normalizedMembers.map((m) => m.trim()),
       transactionId: transactionId.trim(),
-      paymentScreenshot: imageUrl, // ✅ CLOUDINARY URL
+      paymentScreenshot: imageUrl,
     });
 
-    // ✅ OCR PROCESSING — SAFE (UNCHANGED LOGIC)
+    // OCR (SAFE)
     try {
       const text = await extractTextFromImage(imageUrl);
       const parsed = parsePaymentData(text);
@@ -98,14 +109,17 @@ exports.createRegistration = async (req, res) => {
     }
 
     res.status(201).json({ success: true, data: registration });
+
   } catch (error) {
     console.error("Server error:", error);
 
-    if (error.code === 11000) {
-      return res.status(409).json({
-        success: false,
-        message: "Transaction ID already exists",
-      });
+    // 🧹 CLEANUP: delete uploaded image if something failed AFTER upload
+    if (uploadedPublicId) {
+      try {
+        await cloudinary.uploader.destroy(uploadedPublicId);
+      } catch (cleanupErr) {
+        console.error("Cloudinary cleanup failed:", cleanupErr);
+      }
     }
 
     res.status(500).json({
@@ -114,6 +128,7 @@ exports.createRegistration = async (req, res) => {
     });
   }
 };
+
 
 exports.getRegistrations = async (req, res) => {
   try {
