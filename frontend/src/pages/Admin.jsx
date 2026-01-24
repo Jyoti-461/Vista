@@ -204,14 +204,21 @@ const getEventRowColor = (event) => {
                   {/* TEAM DETAILS */}
                   <td className="p-3 border align-top">
                     <div className="font-semibold text-base">
-                      {item.teamName}
-                    </div>
+  {item.teamName}
+</div>
 
-                    <ul className="list-disc ml-5 mt-2 text-sm text-gray-300">
-                      {item.teamMembers?.map((member, index) => (
-                        <li key={index}>{member}</li>
-                      ))}
-                    </ul>
+{/* TEAM LEADER */}
+<div className="mt-2 text-sm font-semibold text-primary">
+  👑 Team Leader: {item.name}
+</div>
+
+{/* TEAM MEMBERS */}
+<ul className="list-disc ml-5 mt-2 text-sm text-gray-300">
+  {item.teamMembers?.map((member, index) => (
+    <li key={index}>{member}</li>
+  ))}
+</ul>
+
                   </td>
                   <td className="p-3 border font-semibold">
   {item.mobile}
