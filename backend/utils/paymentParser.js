@@ -1,72 +1,65 @@
-/**
- * paymentParser.js
- * -----------------
- * Purpose:
- *  - Parse OCR text from payment screenshots
- *  - Detect success indicators
- *  - Extract possible transaction / UTR IDs
- *  - Extract paid amount (if present)
- *
- * SAFE:
- *  - Never throws
- *  - Always returns a predictable object
- */
-
 exports.parsePaymentData = (text) => {
-  // DEFAULT SAFE RESPONSE
-  const result = {
-    successTextFound: false,
-    extractedTxnIds: [],
-    extractedAmount: null,
-  };
-
-  if (!text || typeof text !== "string") {
-    return result;
+  if (!text) {
+    return {
+      extractedTxnIds: [],
+      extractedAmount: null,
+      successTextFound: false,
+    };
   }
 
-  const normalized = text.toLowerCase();
+  const clean = text
+    .replace(/\n/g, " ")
+    .replace(/\s+/g, " ")
+    .toLowerCase();
 
-  /* -----------------------------
-     1. SUCCESS KEYWORDS CHECK
-  ------------------------------ */
+  /* ---------------- TRANSACTION IDS ---------------- */
+
+  // Labeled IDs (UTR, Transaction ID, Ref, etc.)
+  const labeledRegex =
+    /(utr|transaction id|txn id|upi ref|reference no|ref no)[\s:.-]*([a-z0-9]{8,30})/gi;
+
+  const extractedTxnIds = [];
+  let match;
+
+  while ((match = labeledRegex.exec(clean)) !== null) {
+    extractedTxnIds.push(match[2]);
+  }
+
+  // Fallback: long alphanumeric sequences
+  const genericMatches = clean.match(/\b[a-z0-9]{10,30}\b/g);
+  if (genericMatches) {
+    extractedTxnIds.push(...genericMatches);
+  }
+
+  /* ---------------- AMOUNT ---------------- */
+
+  const amountRegex =
+    /(₹|rs\.?|inr)\s?(\d{1,6}(\.\d{1,2})?)/i;
+
+  const amountMatch = clean.match(amountRegex);
+
+  /* ---------------- SUCCESS TEXT ---------------- */
+
   const successKeywords = [
-    "payment successful",
-    "paid successfully",
-    "transaction successful",
+    "successful",
     "success",
     "completed",
     "payment done",
+    "paid",
+    "paid successfully",
+    "transaction successful",
+    "transaction completed",
+    "payment complete",
     "debited",
   ];
 
-  result.successTextFound = successKeywords.some((word) =>
-    normalized.includes(word)
+  const successTextFound = successKeywords.some((k) =>
+    clean.includes(k)
   );
 
-  /* -----------------------------
-     2. TRANSACTION / UTR ID EXTRACTION
-     - UTRs are usually 10–22 alphanumeric chars
-  ------------------------------ */
-  const txnIdRegex = /\b[a-zA-Z0-9]{10,22}\b/g;
-  const matches = text.match(txnIdRegex);
-
-  if (matches) {
-    // Remove duplicates
-    result.extractedTxnIds = [...new Set(matches)];
-  }
-
-  /* -----------------------------
-     3. AMOUNT EXTRACTION (OPTIONAL)
-     - Matches ₹500, Rs. 500, INR 500, 500.00 etc.
-  ------------------------------ */
-  const amountRegex =
-    /(₹|rs\.?|inr)\s?([0-9]+(?:\.[0-9]{1,2})?)/i;
-
-  const amountMatch = text.match(amountRegex);
-
-  if (amountMatch && amountMatch[2]) {
-    result.extractedAmount = amountMatch[2];
-  }
-
-  return result;
+  return {
+    extractedTxnIds: [...new Set(extractedTxnIds)], // remove duplicates
+    extractedAmount: amountMatch ? amountMatch[2] : null,
+    successTextFound,
+  };
 };
