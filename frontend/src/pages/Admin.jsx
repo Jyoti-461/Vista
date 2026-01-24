@@ -226,8 +226,9 @@ const getEventRowColor = (event) => {
 
                   {/* PAYMENT */}
                   <td className="p-3 border">
-                    <a
-                    href={`https://vista-4iwt.onrender.com/${item.paymentScreenshot}`}
+                  
+                  <a
+                    href={item.paymentScreenshot}
                      // href={`http://localhost:5000/${item.paymentScreenshot}`}
                       target="_blank"
                       rel="noreferrer"
