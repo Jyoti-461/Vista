@@ -21,7 +21,7 @@ const [searchTerm, setSearchTerm] = useState("");
   /* 📥 Fetch registrations */
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/register");
+      const res = await axios.get("https://vista-4iwt.onrender.com/api/register");
       setData(res.data.data || res.data);
       setLoading(false);
     } catch (err) {
@@ -227,7 +227,8 @@ const getEventRowColor = (event) => {
                   {/* PAYMENT */}
                   <td className="p-3 border">
                     <a
-                      href={`http://localhost:5000/${item.paymentScreenshot}`}
+                    href={`https://vista-4iwt.onrender.com/${item.paymentScreenshot}`}
+                     // href={`http://localhost:5000/${item.paymentScreenshot}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-primary underline"

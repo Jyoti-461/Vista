@@ -31,7 +31,7 @@ const AdminLogin = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/login",
+        "https://vista-4iwt.onrender.com/api/admin/login",
         credentials
       );
 

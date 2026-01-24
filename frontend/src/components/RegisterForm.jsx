@@ -64,7 +64,7 @@ const RegisterForm = () => {
       });
 
       const res = await axios.post(
-        "http://localhost:5000/api/register",
+        "https://vista-4iwt.onrender.com/api/register",
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
