@@ -57,15 +57,14 @@ exports.createRegistration = async (req, res) => {
         message: `Exactly ${rule.members + 1} players required (including leader)`,
       });
     }
+if (!/^\d{12}$/.test(transactionId.trim())) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid UPI transaction ID",
+  });
+}
 
-    // 🔒 DUPLICATE TRANSACTION CHECK (BEFORE CLOUDINARY)
-    const exists = await Registration.findOne({ transactionId: transactionId.trim() });
-    if (exists) {
-      return res.status(409).json({
-        success: false,
-        message: "Transaction ID already exists",
-      });
-    }
+    
 
     // ✅ CLOUDINARY UPLOAD (ONLY AFTER ALL CHECKS PASS)
     const uploadResult = await cloudinary.uploader.upload(
@@ -86,29 +85,47 @@ exports.createRegistration = async (req, res) => {
       teamMembers: normalizedMembers.map((m) => m.trim()),
       transactionId: transactionId.trim(),
       paymentScreenshot: imageUrl,
+      paymentStatus: "PENDING_OCR",
     });
 
-    // OCR (SAFE)
-    try {
-      const text = await extractTextFromImage(imageUrl);
-      const parsed = parsePaymentData(text);
+    setImmediate(async () => {
+  try {
+    const { text, words } = await extractTextFromImage(imageUrl);
 
-      const normalize = (s) => s?.toLowerCase().replace(/[^a-z0-9]/g, "");
-      const verified =
-        parsed.successTextFound &&
-        parsed.extractedTxnIds?.some((id) =>
-          normalize(id).includes(normalize(transactionId))
-        );
+    const parsed = parsePaymentData({
+      ocrText: text,
+      ocrWords: words,
+    });
 
-      registration.paymentStatus = verified ? "VERIFIED" : "FLAGGED";
-      registration.ocrText = text;
-      registration.ocrData = parsed;
-      await registration.save();
-    } catch (ocrErr) {
-      console.error("OCR failed:", ocrErr);
-    }
+    await Registration.updateOne(
+      { _id: registration._id },
+      {
+        $set: {
+          ocrText: text,
+          ocrData: {
+            extractedTxnIds: parsed.extractedTxnIds,
+           
+            flags: parsed.flags,
+          },
+          paymentStatus:
+            parsed.status === "OCR_CLEAN_MATCH"
+              ? "OCR_CLEAN_MATCH"
+              : "FLAGGED_FOR_REVIEW",
+        },
+      }
+    );
+  } catch (err) {
+    console.error("Async OCR failed:", err.message);
+    await Registration.updateOne(
+    { _id: registration._id },
+    { $set: { paymentStatus: "FLAGGED_FOR_REVIEW" } }
+  );
+  }
+});
+
 
     res.status(201).json({ success: true, data: registration });
+    
 
   } catch (error) {
     console.error("Server error:", error);

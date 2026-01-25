@@ -5,11 +5,17 @@ import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
   const navigate = useNavigate();
+
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState("ALL");
-const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [zoomed, setZoomed] = useState(false);
+
+  const selectedItem =
+    selectedIndex !== null ? filteredData[selectedIndex] : null;
 
   /* 🔐 Protect admin route */
   useEffect(() => {
@@ -21,7 +27,9 @@ const [searchTerm, setSearchTerm] = useState("");
   /* 📥 Fetch registrations */
   const fetchData = async () => {
     try {
-      const res = await axios.get("https://vista-4iwt.onrender.com/api/register");
+      const res = await axios.get(
+        "https://vista-4iwt.onrender.com/api/register"
+      );
       setData(res.data.data || res.data);
       setLoading(false);
     } catch (err) {
@@ -34,13 +42,32 @@ const [searchTerm, setSearchTerm] = useState("");
     fetchData();
   }, []);
 
-  /* 📤 Export to Excel (Team-wise) */
+  /* ⌨️ Keyboard navigation */
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (selectedIndex === null) return;
+
+      if (e.key === "ArrowDown" && selectedIndex < filteredData.length - 1) {
+        setSelectedIndex((i) => i + 1);
+        setZoomed(false);
+      }
+
+      if (e.key === "ArrowUp" && selectedIndex > 0) {
+        setSelectedIndex((i) => i - 1);
+        setZoomed(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selectedIndex]);
+
+  /* 📤 Export to Excel */
   const exportToExcel = () => {
     const formattedData = filteredData.map((item, index) => ({
-
       "Sr No": index + 1,
       "Team Name": item.teamName,
-       "Team Leader": item.name,
+      "Team Leader": item.name,
       "Team Members": item.teamMembers?.join(", "),
       Mobile: item.mobile,
       College: item.college,
@@ -56,52 +83,48 @@ const [searchTerm, setSearchTerm] = useState("");
     XLSX.writeFile(workbook, "TechVerse_Vista_2026_Registrations.xlsx");
   };
 
-  /* 🔓 Logout */
   const handleLogout = () => {
     localStorage.removeItem("isAdmin");
     navigate("/admin-login");
   };
 
-/* ---------------- FILTERED DATA ---------------- */
-const filteredData = data
-  .filter((item) => {
-    if (selectedEvent === "ALL") return true;
-    if (selectedEvent === "BGMI") return item.event === "BGMI E-Sports";
-    if (selectedEvent === "VALORANT") return item.event === "Valorant 5v5";
-    if (selectedEvent === "HACKATHON") return item.event === "Web-a-Thon";
-    return true;
-  })
-  .filter((item) => {
-    if (!searchTerm) return true;
-    const q = searchTerm.toLowerCase();
-    return (
-      item.teamName?.toLowerCase().includes(q) ||
-      item.mobile?.includes(q)
-    );
-  });
+  /* ---------------- FILTERED DATA ---------------- */
+  const filteredData = data
+    .filter((item) => {
+      if (selectedEvent === "ALL") return true;
+      if (selectedEvent === "BGMI") return item.event === "BGMI E-Sports";
+      if (selectedEvent === "VALORANT") return item.event === "Valorant 5v5";
+      if (selectedEvent === "HACKATHON") return item.event === "Web-a-Thon";
+      return true;
+    })
+    .filter((item) => {
+      if (!searchTerm) return true;
+      const q = searchTerm.toLowerCase();
+      return (
+        item.teamName?.toLowerCase().includes(q) ||
+        item.mobile?.includes(q)
+      );
+    });
 
-/* ---------------- COUNTS ---------------- */
-const counts = {
-  ALL: data.length,
-  BGMI: data.filter((i) => i.event === "BGMI E-Sports").length,
-  VALORANT: data.filter((i) => i.event === "Valorant 5v5").length,
-  HACKATHON: data.filter((i) => i.event === "Web-a-Thon").length,
-};
+  /* ---------------- COUNTS ---------------- */
+  const counts = {
+    ALL: data.length,
+    BGMI: data.filter((i) => i.event === "BGMI E-Sports").length,
+    VALORANT: data.filter((i) => i.event === "Valorant 5v5").length,
+    HACKATHON: data.filter((i) => i.event === "Web-a-Thon").length,
+  };
 
-
-const getEventRowColor = (event) => {
-  if (event === "BGMI E-Sports") return "border-l-4 border-blue-500";
-  if (event === "Valorant 5v5") return "border-l-4 border-red-500";
-  if (event === "Web-a-Thon") return "border-l-4 border-green-500";
-  return "";
-};
-
+  const getEventRowColor = (event) => {
+    if (event === "BGMI E-Sports") return "border-l-4 border-blue-500";
+    if (event === "Valorant 5v5") return "border-l-4 border-red-500";
+    if (event === "Web-a-Thon") return "border-l-4 border-green-500";
+    return "";
+  };
 
   return (
     <div className="min-h-screen bg-darkbg text-gray-200 p-6">
       {/* HEADER */}
-      
-      <div className="flex flex-wrap items-center justify-between mb-6 gap-4">
+      <div className="flex justify-between mb-6">
         <h1 className="text-3xl font-bold text-primary">
           Admin Panel – Registrations
         </h1>
@@ -109,171 +132,124 @@ const getEventRowColor = (event) => {
         <div className="flex gap-3">
           <button
             onClick={exportToExcel}
-            className="px-4 py-2 rounded-lg bg-primary text-white"
+            className="px-4 py-2 bg-primary rounded"
           >
             Export to Excel
           </button>
-
           <button
             onClick={handleLogout}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white"
+            className="px-4 py-2 bg-red-600 rounded"
           >
             Logout
           </button>
         </div>
       </div>
-      {/* FILTER BAR */}
-{/* FILTER BAR WITH COUNTS */}
-<div className="sticky top-0 z-20 bg-darkbg py-3 mb-6">
-  <div className="flex items-center justify-between flex-wrap gap-4">
 
-  {/* LEFT: FILTER BUTTONS */}
-  <div className="flex gap-3 flex-wrap">
-    {[
-      { key: "ALL", label: "All" },
-      { key: "BGMI", label: "BGMI" },
-      { key: "VALORANT", label: "Valorant" },
-      { key: "HACKATHON", label: "Hackathon" },
-    ].map((btn) => (
-      <button
-        key={btn.key}
-        onClick={() => setSelectedEvent(btn.key)}
-        className={`px-4 py-2 rounded-lg text-sm font-semibold border flex items-center gap-2
-          ${
-            selectedEvent === btn.key
-              ? "bg-primary text-white border-primary"
-              : "bg-darkcard text-gray-300 border-gray-600"
-          }`}
-      >
-        {btn.label}
-        <span
-          className={`px-2 py-0.5 rounded-full text-xs font-bold
-            ${
-              selectedEvent === btn.key
-                ? "bg-white text-primary"
-                : "bg-gray-700 text-gray-200"
-            }`}
-        >
-          {counts[btn.key]}
-        </span>
-      </button>
-    ))}
-  </div>
-  </div>
-
-  {/* RIGHT: TOTAL COUNT */}
-  <div className="px-4 py-2 rounded-lg bg-darkcard border border-gray-600 text-sm font-semibold">
-    <input
-  type="text"
-  placeholder="Search by Team / Mobile"
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-  className="px-4 py-2 rounded-lg bg-darkcard border border-gray-600 text-sm text-gray-200"
-/>
-  </div>
-</div>
-
-
-
-      {/* CONTENT */}
+      {/* MAIN CONTENT */}
       {loading ? (
-        <p>Loading registrations...</p>
-      ) : data.length === 0 ? (
-        <p>No registrations found.</p>
+        <p>Loading...</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full border border-gray-700 rounded-lg">
-            <thead className="bg-darkcard">
-              <tr>
-                <th className="p-3 border">Team Details</th>
-                <th className="p-3 border">Mobile No</th>
-                <th className="p-3 border">College</th>
-                <th className="p-3 border">Event</th>
-                <th className="p-3 border">Payment</th>
-                <th className="p-3 border">Status</th>
-                <th className="p-3 border">Date</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredData.map((item) => (
-                <tr
-  key={item._id}
-  className={`hover:bg-darkcard/60 ${getEventRowColor(item.event)}`}
->
-
-                  {/* TEAM DETAILS */}
-                  <td className="p-3 border align-top">
-                    <div className="font-semibold text-base">
-  {item.teamName}
-</div>
-
-{/* TEAM LEADER */}
-<div className="mt-2 text-sm font-semibold text-primary">
-  👑 Team Leader: {item.name}
-</div>
-
-{/* TEAM MEMBERS */}
-<ul className="list-disc ml-5 mt-2 text-sm text-gray-300">
-  {item.teamMembers?.map((member, index) => (
-    <li key={index}>{member}</li>
-  ))}
-</ul>
-
-                  </td>
-                  <td className="p-3 border font-semibold">
-  {item.mobile}
-</td>
-
-
-                  {/* COLLEGE */}
-                  <td className="p-3 border">{item.college}</td>
-
-                  {/* EVENT */}
-                  <td className="p-3 border">{item.event}</td>
-
-                  {/* PAYMENT */}
-                  <td className="p-3 border">
-                  
-                  <a
-                    href={item.paymentScreenshot}
-                     // href={`http://localhost:5000/${item.paymentScreenshot}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary underline"
-                    >
-                      View Screenshot
-                    </a>
-                    <div className="text-xs mt-1">
-                      TXN: {item.transactionId}
-                    </div>
-                  </td>
-
-                  {/* STATUS */}
-                  <td className="p-3 border">
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-semibold ${
-                        item.paymentStatus === "VERIFIED"
-                          ? "bg-green-600"
-                          : item.paymentStatus === "FLAGGED"
-                          ? "bg-yellow-600"
-                          : item.paymentStatus === "REJECTED"
-                          ? "bg-red-600"
-                          : "bg-gray-600"
-                      }`}
-                    >
-                      {item.paymentStatus}
-                    </span>
-                  </td>
-
-                  {/* DATE */}
-                  <td className="p-3 border text-sm">
-                    {new Date(item.createdAt).toLocaleString()}
-                  </td>
+        <div className="flex gap-4 transition-all duration-300 ease-in-out">
+          {/* TABLE */}
+          <div
+            className={`transition-all duration-300 ease-in-out ${
+              selectedItem ? "w-3/5" : "w-full"
+            }`}
+          >
+            <table className="w-full border border-gray-700 rounded-lg">
+              <thead className="bg-darkcard">
+                <tr>
+                  <th className="p-3 border">Team</th>
+                  <th className="p-3 border">Mobile</th>
+                  <th className="p-3 border">Event</th>
+                  <th className="p-3 border">Payment</th>
+                  <th className="p-3 border">Status</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filteredData.map((item, index) => (
+                  <tr
+                    key={item._id}
+                    onClick={() => {
+                      setSelectedIndex(index);
+                      setZoomed(false);
+                    }}
+                    className={`cursor-pointer hover:bg-darkcard/60 transition
+                      ${getEventRowColor(item.event)}
+                      ${
+                        selectedIndex === index
+                          ? "bg-darkcard border-l-4 border-primary"
+                          : ""
+                      }
+                    `}
+                  >
+                    <td className="p-3 border">
+                      <div className="font-bold">{item.teamName}</div>
+                      <div className="text-sm text-primary">
+                        👑 {item.name}
+                      </div>
+                    </td>
+                    <td className="p-3 border">{item.mobile}</td>
+                    <td className="p-3 border">{item.event}</td>
+                    <td className="p-3 border">
+                      <button className="text-primary underline">
+                        View Screenshot
+                      </button>
+                      <div className="text-xs mt-1">
+                        TXN: {item.transactionId}
+                      </div>
+                    </td>
+                    <td className="p-3 border">
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold ${
+                          item.paymentStatus === "OCR_CLEAN_MATCH"
+                            ? "bg-green-600"
+                            : item.paymentStatus === "FLAGGED_FOR_REVIEW"
+                            ? "bg-yellow-600"
+                            : item.paymentStatus === "REJECTED"
+                            ? "bg-red-600"
+                            : "bg-gray-600"
+                        }`}
+                      >
+                        {item.paymentStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* SCREENSHOT VIEWER */}
+          {selectedItem && (
+            <div className="w-2/5 bg-darkcard border border-gray-700 rounded-lg p-4 transition-all duration-300 ease-in-out">
+              <h2 className="text-lg font-bold mb-2 text-primary">
+                Payment Screenshot
+              </h2>
+
+              <img
+                src={selectedItem.paymentScreenshot}
+                alt="Screenshot"
+                onClick={() => setZoomed((z) => !z)}
+                className={`cursor-zoom-in transition-transform duration-300 ease-in-out ${
+                  zoomed
+                    ? "scale-150 cursor-zoom-out"
+                    : "scale-100"
+                } w-full object-contain max-h-[70vh] rounded`}
+              />
+
+              <div className="mt-4">
+                <div className="text-xl font-bold text-primary">
+                  TXN: {selectedItem.transactionId}
+                </div>
+                <div>Event: {selectedItem.event}</div>
+                <div>Status: {selectedItem.paymentStatus}</div>
+                <div className="text-xs text-gray-400 mt-2">
+                  Click image to zoom • ↑ / ↓ to navigate
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

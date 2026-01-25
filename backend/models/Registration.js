@@ -25,23 +25,30 @@ const registrationSchema = new mongoose.Schema(
       default: [],
     },
 
-    transactionId: { type: String, required: true, unique: true },
+    transactionId: { type: String, required: true, index: true },
+
 
     paymentScreenshot: { type: String, required: true },
 
     ocrText: { type: String, default: null },
 
     paymentStatus: {
-      type: String,
-      enum: ["PENDING", "VERIFIED", "FLAGGED", "REJECTED"],
-      default: "PENDING",
-    },
+  type: String,
+  enum: [
+    "PENDING_OCR",
+    "OCR_CLEAN_MATCH",
+    "FLAGGED_FOR_REVIEW",
+    "REJECTED"
+  ],
+  default: "PENDING_OCR",
+},
 
-    ocrData: {
-      extractedTxnId: String,
-      extractedAmount: String,
-      successTextFound: Boolean,
-    },
+
+   ocrData: {
+  extractedTxnIds: [String],
+  flags: [String],
+},
+
   },
   { timestamps: true }
 );
