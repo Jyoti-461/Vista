@@ -196,6 +196,7 @@ useEffect(() => {
                 <tr>
                   <th className="p-3 border">Team</th>
                   <th className="p-3 border">Mobile</th>
+                  <th className="p-3 border">College</th>
                   <th className="p-3 border">Event</th>
                   <th className="p-3 border">Payment</th>
                   <th className="p-3 border">Status</th>
@@ -235,6 +236,7 @@ useEffect(() => {
   )}
                     </td>
                     <td className="p-3 border">{item.mobile}</td>
+                    <td className="p-3 border">{item.college}</td>
                     <td className="p-3 border">{item.event}</td>
                     <td className="p-3 border">
   <button
@@ -286,39 +288,39 @@ useEffect(() => {
           </div>
 
           {/* SCREENSHOT VIEWER */}
-          {selectedItem && (
-  <div className="w-2/5 bg-darkcard border border-gray-700 rounded-lg p-4 flex flex-col relative">
-    
-    {/* ❌ CLOSE BUTTON */}
-    <button
-      onClick={() => {
-        setSelectedIndex(null);
-        setZoomed(false);
-      }}
-      className="absolute top-2 right-2 text-gray-400 hover:text-white text-xl font-bold"
-      title="Close preview"
-    >
-      ×
-    </button>
+         {selectedItem && (
+            <div className="w-2/5 bg-darkcard border rounded p-4 relative">
+              {/* CLOSE */}
+              <button
+                className="absolute top-2 right-2 text-xl"
+                onClick={() => {
+                  setSelectedIndex(null);
+                  setZoomed(false);
+                }}
+              >
+                ×
+              </button>
 
-    {/* TXN ID – ALWAYS VISIBLE */}
-    <div className="text-xl font-bold text-primary mb-2">
-      TXN: {selectedItem.transactionId}
-    </div>
+              {/* STICKY TXN HEADER */}
+              <div className="sticky top-0 bg-darkcard z-10 pb-2">
+                <div className="text-xl font-bold text-primary">
+                  TXN: {selectedItem.transactionId}
+                </div>
+              </div>
 
-    {/* IMAGE CONTAINER */}
-    <div className="flex-1 overflow-auto border rounded bg-black">
-      <img
-        src={selectedItem.paymentScreenshot}
-        alt="Screenshot"
-        onClick={() => setZoomed((z) => !z)}
-        className={`mx-auto transition-transform duration-300 cursor-zoom-in ${
-          zoomed ? "scale-150" : "scale-100"
-        } object-contain`}
-      />
-    </div>
-  </div>
-)}
+              {/* IMAGE */}
+              <div className="mt-3 overflow-auto bg-black rounded">
+                <img
+                  src={selectedItem.paymentScreenshot}
+                  onClick={() => setZoomed((z) => !z)}
+                  className={`mx-auto transition-transform duration-300 ${
+                    zoomed ? "scale-150" : "scale-100"
+                  }`}
+                  alt="Payment"
+                />
+              </div>
+            </div>
+          )}
 
 
         </div>
