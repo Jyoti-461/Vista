@@ -13,6 +13,21 @@ const Admin = () => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [zoomed, setZoomed] = useState(false);
 
+/*Keyboard esc*/
+useEffect(() => {
+  const handleEsc = (e) => {
+    if (e.key === "Escape") {
+      setSelectedIndex(null);
+      setZoomed(false);
+    }
+  };
+
+  window.addEventListener("keydown", handleEsc);
+  return () => window.removeEventListener("keydown", handleEsc);
+}, []);
+
+
+
   /* 🔐 Protect admin route */
   useEffect(() => {
     if (!localStorage.getItem("isAdmin")) {
@@ -203,16 +218,67 @@ const Admin = () => {
                       }`}
                   >
                     <td className="p-3 border">
-                      <div className="font-bold">{item.teamName}</div>
-                      <div className="text-sm text-primary">👑 {item.name}</div>
+                     <div className="font-semibold text-base">
+    {item.teamName}
+  </div>
+
+  <div className="mt-1 text-sm font-semibold text-primary">
+    👑 Team Leader: {item.name}
+  </div>
+
+  {item.teamMembers?.length > 0 && (
+    <ul className="list-disc ml-5 mt-2 text-sm text-gray-300">
+      {item.teamMembers.map((member, idx) => (
+        <li key={idx}>{member}</li>
+      ))}
+    </ul>
+  )}
                     </td>
                     <td className="p-3 border">{item.mobile}</td>
                     <td className="p-3 border">{item.event}</td>
-                    <td className="p-3 border text-primary underline">
-                      View Screenshot
-                      <div className="text-xs mt-1">TXN: {item.transactionId}</div>
-                    </td>
-                    <td className="p-3 border">{item.paymentStatus}</td>
+                    <td className="p-3 border">
+  <button
+    onClick={() => {
+      setSelectedIndex(index);
+      setZoomed(false);
+    }}
+    className="text-primary underline"
+  >
+    View Screenshot
+  </button>
+
+  <div className="text-xs mt-1 text-gray-200">
+    TXN: {item.transactionId}
+  </div>
+</td>
+
+                    <td className="p-3 border align-top">
+  <span
+    className={`px-2 py-1 rounded text-xs font-semibold inline-block ${
+      item.paymentStatus === "OCR_CLEAN_MATCH"
+        ? "bg-green-600 text-white"
+        : item.paymentStatus === "FLAGGED_FOR_REVIEW"
+        ? "bg-yellow-600 text-black"
+        : item.paymentStatus === "REJECTED"
+        ? "bg-red-600 text-white"
+        : item.paymentStatus === "PENDING_OCR"
+        ? "bg-gray-600 text-white"
+        : "bg-gray-600 text-white"
+    }`}
+  >
+    {item.paymentStatus}
+  </span>
+
+  {/* OCR FLAGS (unchanged, still highlighted) */}
+  {item.ocrData?.flags?.length > 0 && (
+    <ul className="mt-1 text-xs text-yellow-300">
+      {item.ocrData.flags.map((f, i) => (
+        <li key={i}>• {f}</li>
+      ))}
+    </ul>
+  )}
+</td>
+
                   </tr>
                 ))}
               </tbody>
@@ -221,23 +287,40 @@ const Admin = () => {
 
           {/* SCREENSHOT VIEWER */}
           {selectedItem && (
-            <div className="w-2/5 bg-darkcard border rounded-lg p-4">
-              <img
-                src={selectedItem.paymentScreenshot}
-                alt="Screenshot"
-                onClick={() => setZoomed((z) => !z)}
-                className={`transition-transform duration-300 cursor-zoom-in ${
-                  zoomed ? "scale-150" : "scale-100"
-                } w-full max-h-[70vh] object-contain`}
-              />
-              <div className="mt-4 text-lg font-bold text-primary">
-                TXN: {selectedItem.transactionId}
-              </div>
-              <div className="text-sm mt-1">
-                ↑ / ↓ to navigate • Click image to zoom
-              </div>
-            </div>
-          )}
+  <div className="w-2/5 bg-darkcard border border-gray-700 rounded-lg p-4 flex flex-col relative">
+    
+    {/* ❌ CLOSE BUTTON */}
+    <button
+      onClick={() => {
+        setSelectedIndex(null);
+        setZoomed(false);
+      }}
+      className="absolute top-2 right-2 text-gray-400 hover:text-white text-xl font-bold"
+      title="Close preview"
+    >
+      ×
+    </button>
+
+    {/* TXN ID – ALWAYS VISIBLE */}
+    <div className="text-xl font-bold text-primary mb-2">
+      TXN: {selectedItem.transactionId}
+    </div>
+
+    {/* IMAGE CONTAINER */}
+    <div className="flex-1 overflow-auto border rounded bg-black">
+      <img
+        src={selectedItem.paymentScreenshot}
+        alt="Screenshot"
+        onClick={() => setZoomed((z) => !z)}
+        className={`mx-auto transition-transform duration-300 cursor-zoom-in ${
+          zoomed ? "scale-150" : "scale-100"
+        } object-contain`}
+      />
+    </div>
+  </div>
+)}
+
+
         </div>
       )}
     </div>
