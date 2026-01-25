@@ -10,12 +10,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState("ALL");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [zoomed, setZoomed] = useState(false);
-
-  const selectedItem =
-    selectedIndex !== null ? filteredData[selectedIndex] : null;
 
   /* 🔐 Protect admin route */
   useEffect(() => {
@@ -42,6 +38,28 @@ const Admin = () => {
     fetchData();
   }, []);
 
+  /* ---------------- FILTERED DATA ---------------- */
+  const filteredData = data
+    .filter((item) => {
+      if (selectedEvent === "ALL") return true;
+      if (selectedEvent === "BGMI") return item.event === "BGMI E-Sports";
+      if (selectedEvent === "VALORANT") return item.event === "Valorant 5v5";
+      if (selectedEvent === "HACKATHON") return item.event === "Web-a-Thon";
+      return true;
+    })
+    .filter((item) => {
+      if (!searchTerm) return true;
+      const q = searchTerm.toLowerCase();
+      return (
+        item.teamName?.toLowerCase().includes(q) ||
+        item.mobile?.includes(q)
+      );
+    });
+
+  /* ✅ SAFE: selectedItem AFTER filteredData */
+  const selectedItem =
+    selectedIndex !== null ? filteredData[selectedIndex] : null;
+
   /* ⌨️ Keyboard navigation */
   useEffect(() => {
     const handleKey = (e) => {
@@ -51,7 +69,6 @@ const Admin = () => {
         setSelectedIndex((i) => i + 1);
         setZoomed(false);
       }
-
       if (e.key === "ArrowUp" && selectedIndex > 0) {
         setSelectedIndex((i) => i - 1);
         setZoomed(false);
@@ -60,7 +77,7 @@ const Admin = () => {
 
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [selectedIndex]);
+  }, [selectedIndex, filteredData.length]);
 
   /* 📤 Export to Excel */
   const exportToExcel = () => {
@@ -88,24 +105,6 @@ const Admin = () => {
     navigate("/admin-login");
   };
 
-  /* ---------------- FILTERED DATA ---------------- */
-  const filteredData = data
-    .filter((item) => {
-      if (selectedEvent === "ALL") return true;
-      if (selectedEvent === "BGMI") return item.event === "BGMI E-Sports";
-      if (selectedEvent === "VALORANT") return item.event === "Valorant 5v5";
-      if (selectedEvent === "HACKATHON") return item.event === "Web-a-Thon";
-      return true;
-    })
-    .filter((item) => {
-      if (!searchTerm) return true;
-      const q = searchTerm.toLowerCase();
-      return (
-        item.teamName?.toLowerCase().includes(q) ||
-        item.mobile?.includes(q)
-      );
-    });
-
   /* ---------------- COUNTS ---------------- */
   const counts = {
     ALL: data.length,
@@ -128,34 +127,55 @@ const Admin = () => {
         <h1 className="text-3xl font-bold text-primary">
           Admin Panel – Registrations
         </h1>
-
         <div className="flex gap-3">
-          <button
-            onClick={exportToExcel}
-            className="px-4 py-2 bg-primary rounded"
-          >
+          <button onClick={exportToExcel} className="px-4 py-2 bg-primary rounded">
             Export to Excel
           </button>
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-red-600 rounded"
-          >
+          <button onClick={handleLogout} className="px-4 py-2 bg-red-600 rounded">
             Logout
           </button>
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
+      {/* FILTER BAR */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex gap-3">
+          {[
+            { key: "ALL", label: "All" },
+            { key: "BGMI", label: "BGMI" },
+            { key: "VALORANT", label: "Valorant" },
+            { key: "HACKATHON", label: "Hackathon" },
+          ].map((btn) => (
+            <button
+              key={btn.key}
+              onClick={() => setSelectedEvent(btn.key)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+                selectedEvent === btn.key
+                  ? "bg-primary text-white"
+                  : "bg-darkcard text-gray-300"
+              }`}
+            >
+              {btn.label} ({counts[btn.key]})
+            </button>
+          ))}
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search by Team / Mobile"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="px-4 py-2 rounded bg-darkcard border border-gray-600"
+        />
+      </div>
+
+      {/* CONTENT */}
       {loading ? (
         <p>Loading...</p>
       ) : (
-        <div className="flex gap-4 transition-all duration-300 ease-in-out">
+        <div className="flex gap-4 transition-all duration-300">
           {/* TABLE */}
-          <div
-            className={`transition-all duration-300 ease-in-out ${
-              selectedItem ? "w-3/5" : "w-full"
-            }`}
-          >
+          <div className={selectedItem ? "w-3/5" : "w-full"}>
             <table className="w-full border border-gray-700 rounded-lg">
               <thead className="bg-darkcard">
                 <tr>
@@ -174,46 +194,25 @@ const Admin = () => {
                       setSelectedIndex(index);
                       setZoomed(false);
                     }}
-                    className={`cursor-pointer hover:bg-darkcard/60 transition
+                    className={`cursor-pointer hover:bg-darkcard/60
                       ${getEventRowColor(item.event)}
                       ${
                         selectedIndex === index
                           ? "bg-darkcard border-l-4 border-primary"
                           : ""
-                      }
-                    `}
+                      }`}
                   >
                     <td className="p-3 border">
                       <div className="font-bold">{item.teamName}</div>
-                      <div className="text-sm text-primary">
-                        👑 {item.name}
-                      </div>
+                      <div className="text-sm text-primary">👑 {item.name}</div>
                     </td>
                     <td className="p-3 border">{item.mobile}</td>
                     <td className="p-3 border">{item.event}</td>
-                    <td className="p-3 border">
-                      <button className="text-primary underline">
-                        View Screenshot
-                      </button>
-                      <div className="text-xs mt-1">
-                        TXN: {item.transactionId}
-                      </div>
+                    <td className="p-3 border text-primary underline">
+                      View Screenshot
+                      <div className="text-xs mt-1">TXN: {item.transactionId}</div>
                     </td>
-                    <td className="p-3 border">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-semibold ${
-                          item.paymentStatus === "OCR_CLEAN_MATCH"
-                            ? "bg-green-600"
-                            : item.paymentStatus === "FLAGGED_FOR_REVIEW"
-                            ? "bg-yellow-600"
-                            : item.paymentStatus === "REJECTED"
-                            ? "bg-red-600"
-                            : "bg-gray-600"
-                        }`}
-                      >
-                        {item.paymentStatus}
-                      </span>
-                    </td>
+                    <td className="p-3 border">{item.paymentStatus}</td>
                   </tr>
                 ))}
               </tbody>
@@ -222,31 +221,20 @@ const Admin = () => {
 
           {/* SCREENSHOT VIEWER */}
           {selectedItem && (
-            <div className="w-2/5 bg-darkcard border border-gray-700 rounded-lg p-4 transition-all duration-300 ease-in-out">
-              <h2 className="text-lg font-bold mb-2 text-primary">
-                Payment Screenshot
-              </h2>
-
+            <div className="w-2/5 bg-darkcard border rounded-lg p-4">
               <img
                 src={selectedItem.paymentScreenshot}
                 alt="Screenshot"
                 onClick={() => setZoomed((z) => !z)}
-                className={`cursor-zoom-in transition-transform duration-300 ease-in-out ${
-                  zoomed
-                    ? "scale-150 cursor-zoom-out"
-                    : "scale-100"
-                } w-full object-contain max-h-[70vh] rounded`}
+                className={`transition-transform duration-300 cursor-zoom-in ${
+                  zoomed ? "scale-150" : "scale-100"
+                } w-full max-h-[70vh] object-contain`}
               />
-
-              <div className="mt-4">
-                <div className="text-xl font-bold text-primary">
-                  TXN: {selectedItem.transactionId}
-                </div>
-                <div>Event: {selectedItem.event}</div>
-                <div>Status: {selectedItem.paymentStatus}</div>
-                <div className="text-xs text-gray-400 mt-2">
-                  Click image to zoom • ↑ / ↓ to navigate
-                </div>
+              <div className="mt-4 text-lg font-bold text-primary">
+                TXN: {selectedItem.transactionId}
+              </div>
+              <div className="text-sm mt-1">
+                ↑ / ↓ to navigate • Click image to zoom
               </div>
             </div>
           )}
