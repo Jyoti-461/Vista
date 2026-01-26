@@ -25,7 +25,7 @@ const registrationSchema = new mongoose.Schema(
       default: [],
     },
 
-    transactionId: { type: String, required: true, index: true },
+    transactionId: { type: String, required: true, index: true, unique: true },
 
 
     paymentScreenshot: { type: String, required: true },

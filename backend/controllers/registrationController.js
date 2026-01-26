@@ -88,7 +88,7 @@ if (!/^\d{12}$/.test(transactionId.trim())) {
       paymentStatus: "PENDING_OCR",
     });
 
-    setImmediate(async () => {
+setImmediate(async () => {
   try {
     const { text, words } = await extractTextFromImage(imageUrl);
 
@@ -97,6 +97,33 @@ if (!/^\d{12}$/.test(transactionId.trim())) {
       ocrWords: words,
     });
 
+    const userTxn = registration.transactionId.trim();
+
+    let finalStatus = "FLAGGED_FOR_REVIEW";
+    const finalFlags = [...parsed.flags];
+
+    /* -------------------------------------------------
+       HARD TXN MATCH — NO COMPROMISE
+    --------------------------------------------------*/
+
+    if (parsed.extractedTxnIds.length !== 1) {
+      finalFlags.push("TXN_ID_COUNT_INVALID");
+    } else {
+      const ocrTxn = parsed.extractedTxnIds[0].trim();
+
+      if (ocrTxn !== userTxn) {
+        finalFlags.push("TXN_ID_MISMATCH");
+      }
+    }
+
+    /* -------------------------------------------------
+       FINAL STATUS DECISION
+    --------------------------------------------------*/
+
+    if (finalFlags.length === 0) {
+      finalStatus = "OCR_CLEAN_MATCH";
+    }
+
     await Registration.updateOne(
       { _id: registration._id },
       {
@@ -104,24 +131,21 @@ if (!/^\d{12}$/.test(transactionId.trim())) {
           ocrText: text,
           ocrData: {
             extractedTxnIds: parsed.extractedTxnIds,
-           
-            flags: parsed.flags,
+            flags: finalFlags,
           },
-          paymentStatus:
-            parsed.status === "OCR_CLEAN_MATCH"
-              ? "OCR_CLEAN_MATCH"
-              : "FLAGGED_FOR_REVIEW",
+          paymentStatus: finalStatus,
         },
       }
     );
   } catch (err) {
     console.error("Async OCR failed:", err.message);
     await Registration.updateOne(
-    { _id: registration._id },
-    { $set: { paymentStatus: "FLAGGED_FOR_REVIEW" } }
-  );
+      { _id: registration._id },
+      { $set: { paymentStatus: "FLAGGED_FOR_REVIEW" } }
+    );
   }
 });
+
 
 
     res.status(201).json({ success: true, data: registration });
