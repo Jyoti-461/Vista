@@ -35,12 +35,8 @@ exports.parsePaymentData = ({ ocrText, ocrWords }) => {
 
   /* ---------------- AMOUNT PRESENCE (SANITY ONLY) ---------------- */
 
-const currencyRegex = /(₹|rs\.?|inr|rupee|rupees)/i;
-  const amountNumberRegex = /\b\d{2,3}\b/g;
 
-  if (!currencyRegex.test(clean)) {
-    flags.push("NO_CURRENCY_SYMBOL");
-  }
+  const amountNumberRegex = /\b\d{2,3}\b/g;
 
   if (!(clean.match(amountNumberRegex) || []).length) {
     flags.push("NO_AMOUNT_NUMBER");
@@ -49,11 +45,11 @@ const currencyRegex = /(₹|rs\.?|inr|rupee|rupees)/i;
   /* ---------------- SUCCESS TEXT ---------------- */
 
   const successKeywords = [
+    "transaction successful",
     "successful",
     "completed",
     "paid",
     "payment done",
-    "transaction successful",
     "done",
     "split",
   ];
@@ -70,7 +66,7 @@ const currencyRegex = /(₹|rs\.?|inr|rupee|rupees)/i;
 
   if (txnWords.length > 0) {
     const confidences = txnWords.map((w) => w.confidence || 0);
-    if (Math.max(...confidences) - Math.min(...confidences) > 25) {
+    if (Math.max(...confidences) - Math.min(...confidences) > 10) {
       flags.push("OCR_CONFIDENCE_VARIANCE");
     }
   }
