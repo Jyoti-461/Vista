@@ -302,14 +302,16 @@ useEffect(() => {
               </button>
 
               {/* STICKY TXN HEADER */}
-              <div className="sticky top-0 bg-darkcard z-10 pb-2">
-                <div className="text-xl font-bold text-primary">
-                  TXN: {selectedItem.transactionId}
-                </div>
-              </div>
+              <div className="sticky top-0 bg-darkcard z-10 pb-2 border-b border-gray-700">
+  <div className="text-lg font-bold text-primary truncate">
+    TXN: {selectedItem.transactionId}
+  </div>
+</div>
+
 
               {/* IMAGE */}
-              <div className="w-2/5 bg-darkcard border rounded-lg p-4">
+              <div className="bg-darkcard border rounded-lg p-4 h-full flex flex-col">
+
               <img
                 src={selectedItem.paymentScreenshot}
                 alt="Screenshot"

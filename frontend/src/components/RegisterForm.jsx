@@ -111,6 +111,7 @@ const RegisterForm = () => {
     Note:
   </span>{" "}
   Read <strong>Rules&nbsp;</strong> & <strong>Regulations&nbsp;</strong>in View Details of Event.
+  College ID is <strong>Mandatory&nbsp;</strong>for Verification.
 </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
