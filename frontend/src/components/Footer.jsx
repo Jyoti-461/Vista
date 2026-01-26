@@ -50,7 +50,7 @@ const Footer = () => {
         {/* Social Icons */}
         <div className="flex gap-6 text-xl">
           <a
-            href="https://www.instagram.com/"
+            href="https://www.instagram.com/timscdr.official?igsh=Nnliengyc2ZtcGgw"
             target="_blank"
             rel="noreferrer"
             className="text-gray-500 dark:text-gray-400 hover:text-pink-500 transition"
@@ -59,7 +59,7 @@ const Footer = () => {
           </a>
 
           <a
-            href="https://www.linkedin.com/"
+            href="https://https://www.linkedin.com/school/thakurinstituteofmanagementstudiescareerdevelopmentandresearch/.linkedin.com/"
             target="_blank"
             rel="noreferrer"
             className="text-gray-500 dark:text-gray-400 hover:text-blue-500 transition"

@@ -35,8 +35,8 @@ exports.parsePaymentData = ({ ocrText, ocrWords }) => {
 
   /* ---------------- AMOUNT PRESENCE (SANITY ONLY) ---------------- */
 
-  const currencyRegex = /(₹|rs\.?|inr)/i;
-  const amountNumberRegex = /\b\d{2,4}\b/g;
+const currencyRegex = /(₹|rs\.?|inr|rupee|rupees)/i;
+  const amountNumberRegex = /\b\d{2,3}\b/g;
 
   if (!currencyRegex.test(clean)) {
     flags.push("NO_CURRENCY_SYMBOL");

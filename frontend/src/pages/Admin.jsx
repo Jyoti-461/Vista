@@ -298,7 +298,7 @@ useEffect(() => {
                   setZoomed(false);
                 }}
               >
-                ×
+                X
               </button>
 
               {/* STICKY TXN HEADER */}
@@ -309,15 +309,15 @@ useEffect(() => {
               </div>
 
               {/* IMAGE */}
-              <div className="mt-3 overflow-auto bg-black rounded">
-                <img
-                  src={selectedItem.paymentScreenshot}
-                  onClick={() => setZoomed((z) => !z)}
-                  className={`mx-auto transition-transform duration-300 ${
-                    zoomed ? "scale-150" : "scale-100"
-                  }`}
-                  alt="Payment"
-                />
+              <div className="w-2/5 bg-darkcard border rounded-lg p-4">
+              <img
+                src={selectedItem.paymentScreenshot}
+                alt="Screenshot"
+                onClick={() => setZoomed((z) => !z)}
+                className={`transition-transform duration-300 cursor-zoom-in ${
+                  zoomed ? "scale-150" : "scale-100"
+                } w-full max-h-[70vh] object-contain`}
+              />
               </div>
             </div>
           )}
