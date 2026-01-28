@@ -3,7 +3,7 @@ import HeroImage from "../components/HeroImage";
 import Hero from "../components/Hero";
 import Countdown from "../components/Countdown";
 import Stats from "../components/Stats";
-import Sponsors from "../components/Sponsors";
+//import Sponsors from "../components/Sponsors";
 import Events from "../components/Events";
 import RegisterForm from "../components/RegisterForm";
 import Footer from "../components/Footer";
@@ -19,7 +19,7 @@ const Home = () => {
       <Countdown />
       <About />
       <Stats />
-      <Sponsors />
+      
       <Events />
       <RegisterForm />
       <Footer />
@@ -28,3 +28,4 @@ const Home = () => {
 };
 
 export default Home;
+//<Sponsors />
