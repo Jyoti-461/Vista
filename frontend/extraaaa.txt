@@ -1,0 +1,289 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== SMOOTH THEME TRANSITIONS ===== */
+:root {
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html, body {
+  transition: background-color 0.5s var(--transition-smooth),
+              color 0.5s var(--transition-smooth);
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ===== THEME COLORS ===== */
+/* Default Dark Mode */
+body {
+  background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
+  color: #e5e7eb;
+  min-height: 100vh;
+}
+
+/* Light Mode */
+html:not(.dark) body {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  color: #020617;
+}
+
+/* ===== ANIMATION KEYFRAMES ===== */
+/* Gradient Flow Animations */
+@keyframes volumetric-flow-x {
+  0%, 100% {
+    transform: translateX(-100%);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(0%);
+    opacity: 0.6;
+  }
+}
+
+@keyframes volumetric-flow-y {
+  0%, 100% {
+    transform: translateY(-100%);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translateY(0%);
+    opacity: 0.5;
+  }
+}
+
+@keyframes volumetric-swarm {
+  0% {
+    transform: translate(0, 0) rotate(0);
+  }
+  25% {
+    transform: translate(100px, -50px) rotate(90deg);
+  }
+  50% {
+    transform: translate(0, -100px) rotate(180deg);
+  }
+  75% {
+    transform: translate(-100px, -50px) rotate(270deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+/* Light Beam Animation */
+@keyframes light-beam-volumetric {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+    transform: translateX(0%);
+  }
+  90% {
+    opacity: 0.8;
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(200%);
+    opacity: 0;
+  }
+}
+
+/* Vertical Scroll Animation */
+@keyframes scrollUp {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+/* Pulse Glow for Text */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.8;
+    filter: brightness(1) drop-shadow(0 0 10px rgba(99, 102, 241, 0.3));
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(99, 102, 241, 0.5));
+  }
+}
+
+/* ===== ANIMATION CLASSES ===== */
+.animate-volumetric-flow-x {
+  animation: volumetric-flow-x 15s ease-in-out infinite;
+}
+
+.animate-volumetric-flow-y {
+  animation: volumetric-flow-y 20s ease-in-out infinite reverse;
+}
+
+.animate-volumetric-swarm {
+  animation: volumetric-swarm 60s linear infinite;
+}
+
+.animate-light-beam-volumetric {
+  animation: light-beam-volumetric 5s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite alternate;
+}
+
+/* ===== UTILITY CLASSES ===== */
+/* Glass Effects */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.glass-dark {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Volumetric Glass for Stats */
+.volumetric-glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Volumetric Text Effect */
+.volumetric-text {
+  text-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 0 rgba(255, 255, 255, 0.05),
+    0 3px 0 rgba(255, 255, 255, 0.02);
+}
+
+/* Neon & Glow Effects */
+.neon-primary {
+  text-shadow: 
+    0 0 10px rgba(99, 102, 241, 0.7),
+    0 0 20px rgba(99, 102, 241, 0.5),
+    0 0 30px rgba(99, 102, 241, 0.3);
+}
+
+/* Vertical Scroll for Image Gallery */
+.vertical-scroll {
+  height: 420px;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+.vertical-track {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: scrollUp 20s linear infinite;
+}
+
+.vertical-scroll:hover .vertical-track {
+  animation-play-state: paused;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #6366f1, #8b5cf6);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #8b5cf6, #ec4899);
+}
+
+/* ===== COMPONENT SPECIFIC STYLES ===== */
+/* Button Shine Effect */
+.btn-shine::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 20%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  transform: rotate(30deg);
+  transition: left 0.6s;
+}
+
+.btn-shine:hover::after {
+  left: 120%;
+}
+
+/* Depth Hover Effect for Stats Cards */
+.depth-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.depth-hover:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Smooth Transitions */
+.transition-all-smooth {
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 768px) {
+  .vertical-scroll {
+    height: 300px;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .glass-effect,
+  .glass-dark,
+  .volumetric-glass {
+    background: white !important;
+    backdrop-filter: none !important;
+    border: 1px solid #ddd !important;
+  }
+}
+<button
+            onClick={toggleTheme}
+            className="p-2 md:p-3 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-darkcard transition shadow-sm"
+          >
+            {dark ? <FaSun className="text-yellow-400 text-lg" /> : <FaMoon className="text-indigo-600 text-lg" />}
+          </button>

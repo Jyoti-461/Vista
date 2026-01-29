@@ -1,11 +1,11 @@
 import Navbar from "../components/Navbar";
-import HeroImage from "../components/HeroImage";
+//import HeroImage from "../components/HeroImage";
 import Hero from "../components/Hero";
 import Countdown from "../components/Countdown";
 import Stats from "../components/Stats";
 //import Sponsors from "../components/Sponsors";
 import Events from "../components/Events";
-import RegisterForm from "../components/RegisterForm";
+//import RegisterForm from "../components/RegisterForm";
 import Footer from "../components/Footer";
 import About from "../components/About";
 import { motion } from "framer-motion";
@@ -14,14 +14,14 @@ const Home = () => {
   return (
     <>
       <Navbar />
-       <HeroImage />
+      
       <Hero />
       <Countdown />
       <About />
       <Stats />
       
       <Events />
-      <RegisterForm />
+      
       <Footer />
     </>
   );
@@ -29,3 +29,5 @@ const Home = () => {
 
 export default Home;
 //<Sponsors />
+// <HeroImage />
+//<RegisterForm />

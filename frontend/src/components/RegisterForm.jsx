@@ -110,8 +110,8 @@ const RegisterForm = () => {
   <span className="font-semibold text-yellow-500">
     Note:
   </span>{" "}
-  Read <strong>Rules&nbsp;</strong> & <strong>Regulations&nbsp;</strong>in View Details of Event.
-  College ID is <strong>Mandatory&nbsp;</strong>for Verification.
+  Read <strong>Rules&nbsp;</strong> & <strong>Regulations&nbsp;</strong>in View Details of Event.<br></br>
+  College ID is <strong>Mandatory&nbsp;</strong>on Event Day.
 </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

@@ -43,77 +43,94 @@ useEffect(() => {
           </span>
         </motion.h1>
 
-        {/* Timeline */}
-        <div className="relative">
+        {/* ===== RULES & REGULATIONS SECTION ===== */}
+        {/* ===== CONTENT GRID ===== */}
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.6 }}
+  className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-10"
+>
+  {/* ===== LEFT: RULES & REGULATIONS ===== */}
+  <div className="md:col-span-2 bg-darkcard border border-gray-700 rounded-2xl p-8 md:p-10">
+    <h2 className="text-3xl font-bold text-primary mb-6 text-center md:text-left">
+      Rules & Regulations
+    </h2>
 
-          {/* Vertical Line */}
-          <div className="absolute left-1/2 top-0 h-full w-[2px] bg-primary/40 hidden md:block" />
+    <ul className="space-y-4 text-gray-400 text-sm md:text-base leading-relaxed list-disc list-inside">
+      <li>Matches will be played in <strong>Custom Game</strong> mode.</li>
+      <li>Game settings must be <strong>Standard</strong> with <strong>Tournament Mode ON</strong>.</li>
+      <li>All matches will be conducted in a <strong>5v5 format</strong>.</li>
+      <li>The tournament will follow a <strong>Single Elimination</strong> format.</li>
+      <li>Each match will be <strong>Best of 1 (BO1)</strong>; the final match may be <strong>Best of 3 (BO3)</strong>.</li>
+      <li>Map selection will be decided through <strong>Coin Toss or Veto</strong>.</li>
+      <li>The toss winner can choose either the <strong>Map</strong> or the <strong>Side (Attack/Defense)</strong>.</li>
+      <li><strong>All agents</strong> available in VALORANT are allowed.</li>
+      <li>The first team to <strong>win 13 rounds</strong> wins the match.</li>
+      <li>If the score reaches <strong>12–12</strong>, <strong>Overtime</strong> will be played.</li>
+      <li>In case of disconnection, the match may be paused for up to <strong>5 minutes</strong>.</li>
+      <li>If the player does not return, the team must <strong>continue or forfeit</strong>.</li>
+      <li><strong>Toxic behavior</strong> of any kind is strictly prohibited.</li>
+      <li>Admins may <strong>warn, mute, or disqualify</strong> teams violating rules.</li>
+    </ul>
+  </div>
 
-          <TimelineCard
-            align="left"
-            title="Entry & Team Details"
-            date="Entry Fee"
-            time="₹300 per team"
-            description="Each team must consist of 5 main players. A maximum of 1 substitute is allowed. A player may not play for more than one team."
-          />
+  {/* ===== RIGHT: DETAILS + REGISTER ===== */}
+  {/* ===== RIGHT: DETAILS + REGISTER ===== */}
+  {/* Added h-fit (to shrink height) and self-center (to vertical align) */}
+  <div className="bg-darkcard border border-gray-700 rounded-2xl p-8 flex flex-col justify-between h-fit self-center shadow-xl">
+    <div>
+      <h2 className="text-2xl font-bold text-primary mb-6 text-center">
+        Tournament Details
+      </h2>
 
-          <TimelineCard
-            align="right"
-            title="Game Settings"
-            date="Mode"
-            time="Custom Tournament"
-            description="Game Type: Custom Game. Mode: Standard. Lobby Settings: Tournament Mode ON."
-          />
+      <ul className="space-y-4 text-gray-400 text-sm md:text-base leading-relaxed list-disc list-inside">
+        <li>
+          <strong>Timing:</strong> 10:00 AM – 1:00 PM
+        </li>
+        <li>
+          <strong>Reporting Time:</strong> 9:30 AM
+        </li>
+        <li>
+          <strong>Registration Fee:</strong> ₹300 per team
+        </li>
+        <li>
+          <strong>1st Prize:</strong> ₹3000
+        </li>
+        <li>
+          <strong>1st Runner-Up:</strong> ₹2000
+        </li>
+        <li>
+          <strong>Team Details:</strong> 5 + 1 Player
+        </li>
+      </ul>
+    </div>
 
-          <TimelineCard
-            align="left"
-            title="Match Format"
-            date="Structure"
-            time="Single Elimination"
-            description="All matches are 5v5. Tournament Type: Single Elimination. Matches are BO1. Grand Final may be BO3 based on organizer decision."
-          />
+    {/* REGISTER BUTTON */}
+    <motion.a
+      href="https://forms.gle/roQx1zrMLPbZpYzVA"
+      target="_blank"
+      rel="noopener noreferrer"
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.95 }}
+      className="
+        mt-10
+        inline-block
+        text-center
+        px-6 py-3
+        rounded-lg
+        bg-primary text-white
+        font-medium
+        neon-primary
+        cursor-pointer
+      "
+    >
+      Register Now
+    </motion.a>
+  </div>
+</motion.div>
 
-          <TimelineCard
-            align="right"
-            title="Map Selection"
-            date="Coin Toss"
-            time="Map / Side Choice"
-            description="Map selection will be decided by a coin toss or veto system. Toss winner may choose the map or starting side."
-          />
-
-          <TimelineCard
-            align="left"
-            title="Agent Rules"
-            date="Agents"
-            time="All Allowed"
-            description="All VALORANT agents are allowed unless specific restrictions are announced by organizers."
-          />
-
-          <TimelineCard
-            align="right"
-            title="Round Rules"
-            date="Scoring"
-            time="First to 13"
-            description="Standard VALORANT competitive rules apply. First team to win 13 rounds wins. Overtime is played at 12–12."
-          />
-
-          <TimelineCard
-            align="left"
-            title="Disconnection Policy"
-            date="Timeout"
-            time="5 Minutes"
-            description="Match may be paused for up to 5 minutes. If player fails to reconnect, team must continue or forfeit."
-          />
-
-          <TimelineCard
-            align="right"
-            title="Code of Conduct"
-            date="Fair Play"
-            time="Strictly Enforced"
-            description="Abusive language, racism, harassment, or spamming is prohibited. Admins may warn, mute, or disqualify teams."
-          />
-
-        </div>
       </div>
 
       {/* ===== MOBILE FLOATING BACK BUTTON ===== */}
@@ -136,58 +153,4 @@ useEffect(() => {
     </section>
   );
 };
-
-const TimelineCard = ({ align, title, date, time, description }) => {
-  const isLeft = align === "left";
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: isLeft ? -60 : 60 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className={`
-        relative mb-20
-        flex ${isLeft ? "md:justify-start" : "md:justify-end"}
-      `}
-    >
-      {/* Dot */}
-      <div
-        className="
-          absolute left-1/2 -translate-x-1/2 top-6
-          w-4 h-4 rounded-full bg-primary
-          shadow-[0_0_15px_rgba(99,102,241,0.9)]
-          hidden md:block
-        "
-      />
-
-      {/* Card */}
-      <div
-        className="
-          w-full md:w-[45%]
-          bg-darkcard border border-gray-700
-          rounded-2xl p-6
-          shadow-lg
-        "
-      >
-        <h3 className="text-xl font-semibold text-primary mb-2">
-          {title}
-        </h3>
-
-        <p className="text-sm text-pink-400 mb-1">
-          {date}
-        </p>
-
-        <p className="text-sm text-yellow-400 mb-3">
-          {time}
-        </p>
-
-        <p className="text-sm text-gray-400 leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
 export default Valorant;

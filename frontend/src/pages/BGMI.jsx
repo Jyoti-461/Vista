@@ -44,61 +44,93 @@ useEffect(() => {
           </span>
         </motion.h1>
 
-        {/* Timeline */}
-        <div className="relative">
+         {/* ===== RULES & REGULATIONS SECTION ===== */}
+        {/* ===== CONTENT GRID ===== */}
+<motion.div
+  initial={{ opacity: 0, y: 40 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.6 }}
+  className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-10"
+>
+  {/* ===== LEFT: RULES & REGULATIONS ===== */}
+  <div className="md:col-span-2 bg-darkcard border border-gray-700 rounded-2xl p-8 md:p-10">
+    <h2 className="text-3xl font-bold text-primary mb-6 text-center md:text-left">
+      Rules & Regulations
+    </h2>
 
-          {/* Vertical Line */}
-          <div className="absolute left-1/2 top-0 h-full w-[2px] bg-primary/40 hidden md:block" />
+    <ul className="space-y-4 text-gray-400 text-sm md:text-base leading-relaxed list-disc list-inside">
+      
+      <li><strong>iPads or tablets</strong> are <strong>strictly not allowed</strong>.</li>
+      <li>Participants must bring their own <strong>finger sleeves, headphones, or earphones</strong>.</li>
+      <li>Use of any <strong>electronic gadgets</strong> such as <strong>air triggers</strong> is <strong>strictly prohibited</strong>.</li>
+      <li>Matches will be played in <strong>Best of 3</strong> format.</li>
+      <li>Only <strong>Erangel, Miramar, and Rondo</strong> maps are allowed.</li>
+      <li><strong>Additional rules</strong>, if any, will be <strong>disclosed on the spot</strong>.</li>
+      <li>Final match format and details will be <strong>declared on the event day</strong>.</li>
+      <li>Use of <strong>abusive or vulgar language</strong> at the venue is <strong>strictly prohibited</strong>.</li>
+      <li>All participants must maintain <strong>proper discipline and sportsmanship</strong>.</li>
+      <li>Any form of <strong>malpractice, cheating, or hacking</strong> will lead to <strong>immediate disqualification</strong>.</li>
+      <li>The decisions of the <strong>Event Heads and Judges</strong> will be <strong>final and binding</strong>.</li>
+      <li>Participants must <strong>carry their college ID card</strong> for verification.</li>
+    </ul>
+  </div>
 
-          <TimelineCard
-            align="left"
-            title="Entry & Team Details"
-            date="Entry Fee"
-            time="₹200 per team"
-            description="Each team must consist of 4 main players. A maximum of 1 substitute is allowed. A player may not play for more than one team."
-          />
+  {/* ===== RIGHT: DETAILS + REGISTER ===== */}
+  {/* ===== RIGHT: DETAILS + REGISTER ===== */}
+  {/* Added h-fit (to shrink height) and self-center (to vertical align) */}
+  <div className="bg-darkcard border border-gray-700 rounded-2xl p-8 flex flex-col justify-between h-fit self-center shadow-xl">
+    <div>
+      <h2 className="text-2xl font-bold text-primary mb-6 text-center">
+        Tournament Details
+      </h2>
 
-          <TimelineCard
-            align="right"
-            title="Allowed & Restricted Items"
-            date="Equipment Rules"
-            time="Strictly Enforced"
-            description="No iPads or air triggers allowed. Finger sleeves, headphones or earphones must be brought by participants themselves."
-          />
+      <ul className="space-y-4 text-gray-400 text-sm md:text-base leading-relaxed list-disc list-inside">
+        <li>
+          <strong>Timing:</strong> 10:00 AM – 1:00 PM
+        </li>
+        <li>
+          <strong>Reporting Time:</strong> 9:30 AM
+        </li>
+        <li>
+          <strong>Registration Fee:</strong> ₹300 per team
+        </li>
+        <li>
+          <strong>1st Prize:</strong> ₹3000
+        </li>
+        <li>
+          <strong>1st Runner-Up:</strong> ₹2000
+        </li>
+        <li>
+          <strong>Team Details:</strong> 4 + 1 Player
+        </li>
+      </ul>
+    </div>
 
-          <TimelineCard
-            align="left"
-            title="Game Mode & Maps"
-            date="Match Format"
-            time="Best of 3 Matches"
-            description="Matches will be played only on Erangel, Miramar, and Rondo maps. Additional rules may be disclosed on the spot."
-          />
+    {/* REGISTER BUTTON */}
+    <motion.a
+      href="https://forms.gle/roQx1zrMLPbZpYzVA"
+      target="_blank"
+      rel="noopener noreferrer"
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.95 }}
+      className="
+        mt-10
+        inline-block
+        text-center
+        px-6 py-3
+        rounded-lg
+        bg-primary text-white
+        font-medium
+        neon-primary
+        cursor-pointer
+      "
+    >
+      Register Now
+    </motion.a>
+  </div>
+</motion.div>
 
-          <TimelineCard
-            align="right"
-            title="Code of Conduct"
-            date="Discipline"
-            time="Mandatory"
-            description="No abusive or vulgar language is allowed during match. Any malpractice, cheating, or hacking will lead to immediate disqualification."
-          />
-
-          <TimelineCard
-            align="left"
-            title="Scoring System"
-            date="Points Allocation"
-            time="Per Match"
-            description="Per kill: 1 point. Placement points — 1st: 10, 2nd: 6, 3rd: 5, 4th: 4, 5th: 3, 6th: 2, 7th–8th: 1, 9th–16th: 0."
-          />
-
-          <TimelineCard
-            align="right"
-            title="Final Decision"
-            date="Judgement"
-            time="Event Day"
-            description="Winner will be finalized on the basis of Points Table by Event Judge's. Winners will be declared on the event day."
-          />
-
-        </div>
       </div>
 
       {/* ===== MOBILE FLOATING BACK BUTTON ===== */}
@@ -121,58 +153,4 @@ useEffect(() => {
     </section>
   );
 };
-
-const TimelineCard = ({ align, title, date, time, description }) => {
-  const isLeft = align === "left";
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: isLeft ? -60 : 60 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className={`
-        relative mb-20
-        flex ${isLeft ? "md:justify-start" : "md:justify-end"}
-      `}
-    >
-      {/* Dot */}
-      <div
-        className="
-          absolute left-1/2 -translate-x-1/2 top-6
-          w-4 h-4 rounded-full bg-primary
-          shadow-[0_0_15px_rgba(99,102,241,0.9)]
-          hidden md:block
-        "
-      />
-
-      {/* Card */}
-      <div
-        className="
-          w-full md:w-[45%]
-          bg-darkcard border border-gray-700
-          rounded-2xl p-6
-          shadow-lg
-        "
-      >
-        <h3 className="text-xl font-semibold text-primary mb-2">
-          {title}
-        </h3>
-
-        <p className="text-sm text-pink-400 mb-1">
-          {date}
-        </p>
-
-        <p className="text-sm text-yellow-400 mb-3">
-          {time}
-        </p>
-
-        <p className="text-sm text-gray-400 leading-relaxed">
-          {description}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
-
 export default BGMI;
