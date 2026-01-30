@@ -24,7 +24,7 @@ html {
 
 /* Body optimizations */
 body {
-  transform: translateZ(0);
+  
   will-change: background-color, color;
   overflow-x: hidden;
   min-height: 100vh;

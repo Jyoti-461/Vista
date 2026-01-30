@@ -188,14 +188,7 @@ const Footer = () => {
                 />
               </div>
               
-              {/* Map Overlay Info */}
-              <div className="absolute bottom-4 left-4 right-4 z-20">
-                <div className="bg-gray-900/80 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
-                  <p className="text-sm text-gray-300 font-medium">
-                    Click to open in Google Maps
-                  </p>
-                </div>
-              </div>
+              
             </div>
           </motion.div>
         </div>

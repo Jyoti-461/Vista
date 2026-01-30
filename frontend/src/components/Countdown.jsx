@@ -145,7 +145,7 @@ const Countdown = () => {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="text-lg text-gray-300"
           >
-            February 9-10, 2026 • TIMSCDR Mumbai
+            February 9th-10th, 2026 • TIMSCDR Mumbai
           </motion.p>
           
           {/* Decorative line */}
@@ -231,7 +231,7 @@ const Countdown = () => {
         >
           <div className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
             <p className="text-gray-300">
-              <span className="font-semibold text-cyan-400">Mark your calendar:</span> February 9-10, 2026
+              <span className="font-semibold text-cyan-400">Mark your calendar:</span> February 9th-10th, 2026
             </p>
           </div>
         </motion.div>

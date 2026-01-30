@@ -287,3 +287,31 @@ html:not(.dark) body {
           >
             {dark ? <FaSun className="text-yellow-400 text-lg" /> : <FaMoon className="text-indigo-600 text-lg" />}
           </button>
+
+          {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="mt-8 sm:mt-12 md:mt-16 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 md:gap-6 max-w-3xl mx-auto px-2"
+        >
+          {[
+            { value: teamData.length, label: "Team Members" },
+            { value: "5", label: "Core Committee" },
+            { value: "5", label: "Technical Team" },
+            { value: "2", label: "Digital Team" },
+          ].map((stat, idx) => (
+            <div
+              key={idx}
+              className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 text-center border border-gray-200 dark:border-gray-700"
+            >
+              <div className="text-lg sm:text-xl md:text-2xl font-bold text-primary">
+                {stat.value}
+              </div>
+              <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </motion.div>

@@ -7,6 +7,7 @@ import Stats from "../components/Stats";
 import Events from "../components/Events";
 //import RegisterForm from "../components/RegisterForm";
 import Footer from "../components/Footer";
+import Team from "../components/Team";
 import About from "../components/About";
 import { motion } from "framer-motion";
 
@@ -21,7 +22,7 @@ const Home = () => {
       <Stats />
       
       <Events />
-      
+      <Team />
       <Footer />
     </>
   );

@@ -297,7 +297,7 @@ const About = () => {
                 <h2 className="text-4xl md:text-5xl font-bold mb-8 
                              text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 to-blue-600
                              dark:from-cyan-400 dark:to-blue-500">
-                  About <span className="volumetric-text">TIMSCDR</span> 🏢
+                  About <span className="volumetric-text">TIMSCDR</span>
                 </h2>
 
                 <div className="space-y-4">
@@ -429,7 +429,7 @@ const About = () => {
                 <h2 className="text-4xl md:text-5xl font-bold mb-8 
                              text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-600
                              dark:from-purple-400 dark:to-pink-500">
-                  About <span className="volumetric-text">TechVerse Vista</span> 📜
+                  About <span className="volumetric-text">TechVerse Vista</span>
                 </h2>
 
                 <div className="space-y-4">

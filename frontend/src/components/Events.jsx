@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 const events = [
   {
-    title: "Web-a-Thon",
+    title: "ML2Web-a-Thon",
     description:
       "Build innovative UI/UX with Complex Clustering Problem Statement under time pressure with your team.",
     icon: <FaLaptopCode />,

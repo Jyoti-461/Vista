@@ -82,19 +82,6 @@ const Hero = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Toggle controls with Ctrl+Shift+P
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'P') {
-        e.preventDefault();
-        setShowControls(prev => !prev);
-      }
-    };
-    
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
-
   const scrollToRegister = () => {
     const section = document.getElementById("register");
     section?.scrollIntoView({ behavior: "smooth" });
@@ -376,45 +363,53 @@ const Hero = () => {
 
             {/* Brochure Button */}
             <motion.button
-              onClick={() => {
-                const pdfUrl = "/src/assets/TechVerseVista2026_Brochure.pdf";
-                window.open(pdfUrl, "_blank", "noopener,noreferrer");
-                
-                const link = document.createElement("a");
-                link.href = pdfUrl;
-                link.download = "TechVerseVista2026_Brochure.pdf";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-              }}
-              whileHover={{ 
-                scale: 1.05,
-                boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)"
-              }}
-              whileTap={{ scale: 0.95 }}
-              className="
-                px-6 sm:px-8 py-3 sm:py-4
-                rounded-xl font-semibold text-base sm:text-lg
-                border-2 border-primary/50
-                text-primary
-                bg-white/10 dark:bg-gray-900/50
-                backdrop-blur-sm
-                hover:bg-primary/10
-                transition-all
-                group
-                w-full sm:w-auto
-              "
-            >
-              <span className="flex items-center justify-center gap-2">
-                <motion.span
-                  animate={{ y: [0, -3, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  📄
-                </motion.span>
-                Download Brochure
-              </span>
-            </motion.button>
+  onClick={() => {
+    const pdfUrl = "/TechVerseVista2026_Brochure.pdf";
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // On mobile: Just open - let browser handle it
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+    } else {
+      // On desktop: Open in new tab AND offer download
+      window.open(pdfUrl, "_blank", "noopener,noreferrer");
+      
+      const link = document.createElement("a");
+      link.href = pdfUrl;
+      link.download = "TechVerseVista2026_Brochure.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }}
+  whileHover={{ 
+    scale: 1.05,
+    boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)"
+  }}
+  whileTap={{ scale: 0.95 }}
+  className="
+    px-6 sm:px-8 py-3 sm:py-4
+    rounded-xl font-semibold text-base sm:text-lg
+    border-2 border-primary/50
+    text-primary
+    bg-white/10 dark:bg-gray-900/50
+    backdrop-blur-sm
+    hover:bg-primary/10
+    transition-all
+    group
+    w-full sm:w-auto
+  "
+>
+  <span className="flex items-center justify-center gap-2">
+    <motion.span
+      animate={{ y: [0, -3, 0] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+    >
+      📄
+    </motion.span>
+    Download Brochure
+  </span>
+</motion.button>
           </motion.div>
 
           {/* Countdown or Date Display */}
