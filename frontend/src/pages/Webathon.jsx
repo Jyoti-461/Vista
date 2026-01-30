@@ -122,13 +122,12 @@ const Webathon = () => {
             </h2>
 
             <ul className="space-y-4 text-gray-300 text-sm md:text-base leading-relaxed list-disc list-inside">
-              <li>The website must fulfill the <strong className="text-primary">accuracy of the problem statement</strong>.</li>
               <li>Dataset and exact problem statement will be revealed only at the event time.</li>
               <li>Teams must train an <strong className="text-primary">AI/ML</strong> model using the given dataset and build a web application to showcase results.</li>
               <li>Frameworks/tools such as <strong className="text-primary">Python, PyTorch, NumPy, Flask / Django</strong> are allowed.</li>
               <li>Internet usage is allowed <strong className="text-primary">for AI tools or references</strong>.</li>
               <li>Only the provided dataset is allowed, Pre-built projects are <strong className="text-primary">strictly prohibited</strong>.</li>
-              <li>Judging will be based on <strong className="text-primary">UI, functionality, innovation, and completeness</strong>.</li>
+              <li>Judging will be based on <strong className="text-primary">UI model, functionality, innovation, and completeness</strong>.</li>
               <li>The decision of the judges and event heads will be <strong className="text-primary">final and binding</strong>.</li>
             </ul>
           </div>
