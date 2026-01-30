@@ -5,13 +5,15 @@ const Countdown = () => {
   const eventDate = new Date("2026-02-09T09:30:00").getTime();
 
   const [timeLeft, setTimeLeft] = useState({
-    days: 45,
-    hours: 12,
-    minutes: 30,
+    days: 0,
+    hours: 0,
+    minutes: 0,
     seconds: 0,
   });
 
   const [isInView, setIsInView] = useState(false);
+  const [eventEnded, setEventEnded] = useState(false);
+  const [showFireworks, setShowFireworks] = useState(false);
   const [prevTime, setPrevTime] = useState({ ...timeLeft });
   const containerRef = useRef(null);
   const [particles, setParticles] = useState([]);
@@ -32,6 +34,7 @@ const Countdown = () => {
     setParticles(newParticles);
   }, []);
 
+  
   // Animate particles
   useEffect(() => {
     const interval = setInterval(() => {
@@ -47,29 +50,74 @@ const Countdown = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Countdown timer
+  const calculateTimeLeft = () => {
+    const now = Date.now();
+    const diff = eventDate - now;
+    
+    if (diff <= 0) {
+      return {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 0,
+        ended: true,
+      };
+    }
+
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+      ended: false,
+    };
+  };
+
+  // Main countdown effect
   useEffect(() => {
+    const initial = calculateTimeLeft();
+    setTimeLeft({
+      days: initial.days,
+      hours: initial.hours,
+      minutes: initial.minutes,
+      seconds: initial.seconds,
+    });
+
+    // Check on mount if event already ended
+    if (initial.ended) {
+      setEventEnded(true);
+      setShowFireworks(true);
+      return;
+    }
+
     const timer = setInterval(() => {
-      const now = new Date().getTime();
-      const difference = eventDate - now;
-
-      if (difference <= 0) {
-        clearInterval(timer);
-        return;
-      }
-
-      setPrevTime(prev => ({ ...prev }));
+      const updated = calculateTimeLeft();
+      setPrevTime(prev => ({
+        days: timeLeft.days,
+        hours: timeLeft.hours,
+        minutes: timeLeft.minutes,
+        seconds: timeLeft.seconds,
+      }));
+      
       setTimeLeft({
-        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-        minutes: Math.floor((difference / (1000 * 60)) % 60),
-        seconds: Math.floor((difference / 1000) % 60),
+        days: updated.days,
+        hours: updated.hours,
+        minutes: updated.minutes,
+        seconds: updated.seconds,
       });
+
+      // Trigger when countdown reaches exactly 0
+      if (updated.ended) {
+        setEventEnded(true);
+        setShowFireworks(true);
+        clearInterval(timer);
+      }
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [eventDate]);
+  }, []); // Remove timeLeft from dependencies to avoid infinite loop
 
+  // Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -92,10 +140,10 @@ const Countdown = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative overflow-hidden py-4"> {/* Adjust py-16 for vertical padding */}
+    <div ref={containerRef} className="relative overflow-hidden py-4">
+            
       {/* Background Gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-gray-900 to-purple-900/20" />
-      
       
       {/* Animated Gradient Orbs */}
       <div className="absolute top-20 left-20 w-64 h-64 rounded-full bg-gradient-to-r from-cyan-500/10 to-blue-500/10 animate-pulse blur-3xl" />
@@ -127,7 +175,7 @@ const Countdown = () => {
       </div>
 
       {/* Main Content */}
-      <section className="relative z-10 py-8 text-center"> {/* Adjust py-12 for content padding */}
+      <section className="relative z-10 py-8 text-center">
         {/* Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -136,7 +184,10 @@ const Countdown = () => {
           className="mb-12"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-            Event <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Starts In</span>
+            Event{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
+              {eventEnded ? "Is Live" : "Starts In"}
+            </span>
           </h2>
           
           <motion.p
@@ -157,39 +208,75 @@ const Countdown = () => {
           />
         </motion.div>
 
-        {/* Countdown */}
+        {/* Live Event Banner */}
+        <AnimatePresence>
+          {eventEnded && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="mb-8 flex justify-center"
+            >
+              <div className="relative bg-gradient-to-r from-cyan-500/20 via-purple-500/20 to-pink-500/20 border border-cyan-500/30 rounded-2xl px-8 py-4 backdrop-blur-md shadow-2xl shadow-cyan-500/20">
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-gradient-to-r from-green-400 to-emerald-400 animate-pulse" />
+                    <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">
+                      LIVE NOW
+                    </span>
+                  </div>
+                  <span className="text-gray-300">•</span>
+                  <span className="text-lg text-gray-300">Join the event and participate!</span>
+                </div>
+                {/* Animated glow effect */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 blur-xl -z-10"
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Countdown Cards - Always Visible */}
         <div className="relative">
-          {/* Countdown Cards */}
           <div className="flex justify-center gap-4 md:gap-8 flex-wrap relative z-20">
             <AnimatedTimeBox 
               label="Days" 
               value={timeLeft.days}
               previousValue={prevTime.days}
               index={0}
+              isEventEnded={eventEnded}
             />
             <AnimatedTimeBox 
               label="Hours" 
               value={timeLeft.hours}
               previousValue={prevTime.hours}
               index={1}
+              isEventEnded={eventEnded}
             />
             <AnimatedTimeBox 
               label="Minutes" 
               value={timeLeft.minutes}
               previousValue={prevTime.minutes}
               index={2}
+              isEventEnded={eventEnded}
             />
             <AnimatedTimeBox 
               label="Seconds" 
               value={timeLeft.seconds}
               previousValue={prevTime.seconds}
               index={3}
+              isEventEnded={eventEnded}
             />
           </div>
           
-          {/* Bloom particles on seconds change */}
+          {/* Bloom particles on seconds change - only when event hasn't ended */}
           <AnimatePresence>
-            {timeLeft.seconds !== prevTime.seconds && (
+            {!eventEnded && timeLeft.seconds !== prevTime.seconds && (
               <div className="absolute inset-0 pointer-events-none">
                 {[...Array(8)].map((_, i) => (
                   <motion.div
@@ -231,7 +318,9 @@ const Countdown = () => {
         >
           <div className="inline-block px-6 py-3 rounded-full bg-gradient-to-r from-cyan-500/10 to-purple-500/10 border border-cyan-500/20">
             <p className="text-gray-300">
-              <span className="font-semibold text-cyan-400">Mark your calendar:</span> February 9th-10th, 2026
+              <span className="font-semibold text-cyan-400">
+                {eventEnded ? "Event in progress!" : "Mark your calendar:"}
+              </span> 9th - 10th February
             </p>
           </div>
         </motion.div>
@@ -240,16 +329,16 @@ const Countdown = () => {
   );
 };
 
-const AnimatedTimeBox = ({ label, value, previousValue, index }) => {
+const AnimatedTimeBox = ({ label, value, previousValue, index, isEventEnded }) => {
   const [isChanging, setIsChanging] = useState(false);
 
   useEffect(() => {
-    if (value !== previousValue) {
+    if (!isEventEnded && value !== previousValue) {
       setIsChanging(true);
       const timer = setTimeout(() => setIsChanging(false), 300);
       return () => clearTimeout(timer);
     }
-  }, [value, previousValue]);
+  }, [value, previousValue, isEventEnded]);
 
   return (
     <motion.div
@@ -260,14 +349,14 @@ const AnimatedTimeBox = ({ label, value, previousValue, index }) => {
         delay: index * 0.1 + 0.3
       }}
       whileHover={{ 
-        scale: 1.05,
-        y: -5,
+        scale: isEventEnded ? 1 : 1.05,
+        y: isEventEnded ? 0 : -5,
         transition: { duration: 0.2 }
       }}
       className="relative"
     >
       {/* Glow effect */}
-      {isChanging && (
+      {isChanging && !isEventEnded && (
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1.5, opacity: 0.6 }}
@@ -276,19 +365,40 @@ const AnimatedTimeBox = ({ label, value, previousValue, index }) => {
           className="absolute inset-0 bg-gradient-to-br from-cyan-400/40 via-purple-400/40 to-pink-400/40 blur-lg rounded-2xl"
         />
       )}
+
+      {/* Special glow when event has ended */}
+      {isEventEnded && (
+        <motion.div
+          animate={{ 
+            scale: [1, 1.05, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 via-green-400/20 to-cyan-400/20 blur-lg rounded-2xl"
+        />
+      )}
       
       {/* Main card */}
-      <div className="
+      <div className={`
         relative
-        bg-gradient-to-br from-gray-900/80 to-gray-800/80
+        bg-gradient-to-br ${isEventEnded 
+          ? 'from-emerald-900/30 via-green-900/30 to-cyan-900/30 border-emerald-500/30' 
+          : 'from-gray-900/80 to-gray-800/80 border-gray-700/50'
+        }
         backdrop-blur-md
-        border border-gray-700/50
+        border
         rounded-2xl
         px-6 py-5
         min-w-[100px]
         shadow-xl
         group
-      ">
+        transition-all duration-300
+        ${isEventEnded ? 'shadow-emerald-500/10' : ''}
+      `}>
         {/* Number */}
         <div className="relative h-50 flex items-center justify-center">
           <AnimatePresence mode="wait">
@@ -313,7 +423,11 @@ const AnimatedTimeBox = ({ label, value, previousValue, index }) => {
                 duration: 0.3,
                 ease: "easeInOut"
               }}
-              className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-cyan-400 via-white to-purple-400"
+              className={`text-4xl md:text-5xl font-bold text-transparent bg-clip-text ${
+                isEventEnded 
+                  ? 'bg-gradient-to-b from-emerald-400 via-green-300 to-cyan-400' 
+                  : 'bg-gradient-to-b from-cyan-400 via-white to-purple-400'
+              }`}
             >
               {value.toString().padStart(2, "0")}
             </motion.p>
@@ -322,11 +436,15 @@ const AnimatedTimeBox = ({ label, value, previousValue, index }) => {
         
         {/* Label */}
         <motion.p
-          animate={isChanging ? {
+          animate={isChanging && !isEventEnded ? {
             color: "#22d3ee",
           } : {}}
           transition={{ duration: 0.2 }}
-          className="text-sm text-gray-400 group-hover:text-cyan-300 transition-colors duration-300 mt-2 uppercase tracking-wider"
+          className={`text-sm transition-colors duration-300 mt-2 uppercase tracking-wider ${
+            isEventEnded 
+              ? 'text-emerald-300 group-hover:text-emerald-200' 
+              : 'text-gray-400 group-hover:text-cyan-300'
+          }`}
         >
           {label}
         </motion.p>
