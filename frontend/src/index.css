@@ -971,3 +971,7 @@ html:not(.dark) body {
     opacity: 1 !important;
   }
 }
+
+* {
+  caret-color: transparent;
+}
