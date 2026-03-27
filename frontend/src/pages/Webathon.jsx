@@ -156,6 +156,9 @@ const Webathon = () => {
                   <strong className="text-primary">1st Runner-Up:</strong> ₹1500
                 </li>
                 <li>
+          <strong className="text-primary">Prize:</strong> Trophies & Certificates
+        </li>
+                <li>
                   <strong className="text-primary">Team Details:</strong> 2 Members
                 </li>
               </ul>
